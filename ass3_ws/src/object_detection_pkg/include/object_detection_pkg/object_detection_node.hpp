@@ -1,0 +1,47 @@
+#ifndef OBJECT_DETECTION_NODE_HPP
+#define OBJECT_DETECTION_NODE_HPP
+
+#include "sensor_msgs/msg/image.hpp"
+#include "sensor_msgs/image_encodings.hpp"
+#include "cv_bridge/cv_bridge.hpp"
+#include "opencv2/core/mat.hpp"
+#include "rclcpp/rclcpp.hpp"
+#include "geometry_msgs/msg/point.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/videoio.hpp"
+
+
+class Object_detection_node : public rclcpp::Node
+{
+    public:
+        explicit Object_detection_node(const rclcpp::NodeOptions &options);
+
+    private:
+        void initialize();
+        void parse_parameters();
+        void CoG_determiner(const sensor_msgs::msg::Image::SharedPtr msg);
+        
+        rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
+        rclcpp::Publisher<geometry_msgs::msg::Point>::SharedPtr CoG_pub_;
+
+        // void on_low_H_thresh_trackbar(int, void *);
+        // void on_high_H_thresh_trackbar(int, void *);
+        // void on_low_S_thresh_trackbar(int, void *);
+        // void on_high_S_thresh_trackbar(int, void *);
+        // void on_low_V_thresh_trackbar(int, void *);
+        // void on_high_V_thresh_trackbar(int, void *);
+
+        size_t gray_threshold_;
+        size_t depth_;
+        // const int max_value_H = 360/2;
+        // const int max_value = 255;
+        int low_H, low_S, low_V;
+        int high_H, high_S, high_V;
+        // const std:string window_detection_name = "Object Detection";
+};
+
+#endif // OBJECT_DETECTION_NODE_HPP
+
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(Object_detection_node)
