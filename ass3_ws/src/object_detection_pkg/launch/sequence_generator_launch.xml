@@ -2,7 +2,7 @@
     <node pkg="cam2image_vm2ros" exec="cam2image" name="cam2image" args="--ros-args --params-file src/cam2image_vm2ros/config/cam2image.yaml"/>
     <node pkg="relbot_simulator" exec="relbot_simulator" name="relbot_simulator"/>    
     <node pkg="object_detection_pkg" exec="object_detection_node" name="object_detection_node"/>
-    <node pkg="sequence_controller" exec="sequence_controller" name="sequence_controller">
+    <node pkg="sequence_controller" exec="sequence_controller" name="sequence_controller">        
         <remap from="left_motor_setpoint_vel" to="/input/right_motor/setpoint_vel"/>
         <remap from="right_motor_setpoint_vel" to="/input/right_motor/setpoint_vel"/>   
     </node>"
