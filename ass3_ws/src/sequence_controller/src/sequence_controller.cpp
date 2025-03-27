@@ -7,6 +7,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 
+#include <std_msgs/msg/float64.hpp>
+
 
 using std::placeholders::_1;
 
@@ -23,10 +25,10 @@ class SequenceController : public rclcpp::Node {
                 std::bind(&SequenceController::update_light_pos, this, _1));
 
         publisher_left_ = this->create_publisher<example_interfaces::msg::Float64>(
-            "left_motor_setpoint_vel", 10);
+            "left_motor_setpoint_vel", 10);//std_msgs::msg::Float64
 
         publisher_right_ = this->create_publisher<example_interfaces::msg::Float64>(
-            "right_motor_setpoint_vel", 10);
+            "right_motor_setpoint_vel", 10);//std_msgs::msg::Float64
 
         timer_ = rclcpp::create_timer(
             this, this->get_clock(),
@@ -47,8 +49,8 @@ class SequenceController : public rclcpp::Node {
         RCLCPP_INFO(this->get_logger(), "light_pos.x: %f, e: %f", light_pos_.x,
                     e);
 
-        auto vel_left = example_interfaces::msg::Float64();
-        auto vel_right = example_interfaces::msg::Float64();
+        auto vel_left = example_interfaces::msg::Float64();//std_msgs::msg::Float64
+        auto vel_right = example_interfaces::msg::Float64();//std_msgs::msg::Float64
 
         vel_left.data = e;
         vel_right.data = -e;
@@ -75,8 +77,8 @@ class SequenceController : public rclcpp::Node {
     rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr
         subscription_dim_;
 
-    rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr publisher_left_;
-    rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr publisher_right_;
+    rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr publisher_left_; // std_msgs::msg::Float64
+    rclcpp::Publisher<example_interfaces::msg::Float64>::SharedPtr publisher_right_; //std_msgs::msg::Float64
 
     rclcpp::TimerBase::SharedPtr timer_;
 };
