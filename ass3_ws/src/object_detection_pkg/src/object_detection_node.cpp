@@ -10,7 +10,7 @@ Object_detection_node::Object_detection_node(const rclcpp::NodeOptions &options)
 void Object_detection_node::initialize(){
     auto qos = rclcpp::QoS(depth_);
     image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/output/moving_camera", qos, std::bind(&Object_detection_node::CoG_determiner, this, std::placeholders::_1));
+        "/image", qos, std::bind(&Object_detection_node::CoG_determiner, this, std::placeholders::_1));
 
     CoG_pub_ = this->create_publisher<geometry_msgs::msg::Point>("light_position", qos);  
 
