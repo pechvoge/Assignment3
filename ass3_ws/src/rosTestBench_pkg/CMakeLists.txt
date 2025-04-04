@@ -9,7 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
-find_package(std_msgs REQUIRED)
+find_package(xrf2_msgs REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
   src/rosTestBench_node.cpp
@@ -22,9 +22,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<INSTALL_INTERFACE:include/${PROJECT_NAME}>")
 target_link_libraries(${PROJECT_NAME}
   rclcpp::rclcpp
-  ${std_msgs_TARGETS}
   rclcpp_components::component
   )
+
+ament_target_dependencies(${PROJECT_NAME} xrf2_msgs)
 
 rclcpp_components_register_node(${PROJECT_NAME} PLUGIN "RosTestBench_node" EXECUTABLE rosTestBench_node)
 

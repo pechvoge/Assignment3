@@ -44,7 +44,7 @@ int FRTtestBench::initialised()
 
     evl_printf("Hello from initialised\n");       // Do something
 
-    return 0;
+    return 1;
 }
 
 int FRTtestBench::run()
@@ -66,6 +66,16 @@ int FRTtestBench::run()
         data_to_be_logged.this_is_a_char = 'R';
     data_to_be_logged.this_is_a_float = data_to_be_logged.this_is_a_float/2;
     data_to_be_logged.this_is_a_double = data_to_be_logged.this_is_a_double/4; 
+
+    // Printf encoder 1 to 4 data
+    monitor.printf("Encoder 1 value : %d\n",sample_data.channel1);
+    monitor.printf("Encoder 2 value : %d\n",sample_data.channel2);
+    monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
+    monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
+
+    // Set motor outputs to 25% of max
+    // actuate_data.pwm1 = 2047 * 0.25;
+    // actuate_data.pwm2 = 2047 * -0.25;
 
     controller.Calculate(u, y);
     if(controller.IsFinished())

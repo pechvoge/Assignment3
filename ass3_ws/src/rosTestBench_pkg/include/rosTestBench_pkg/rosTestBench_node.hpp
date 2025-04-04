@@ -3,7 +3,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include <chrono>
-#include "std_msgs/msg/float64.hpp"
+#include "xrf2_msgs/msg/ros2_xeno.hpp"
 #include <string>
 
 class RosTestBench_node : public rclcpp::Node
@@ -19,18 +19,14 @@ class RosTestBench_node : public rclcpp::Node
         void sinusoidal_velocity();
         void sequence_velocity();
 
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr left_motor_pub_;
-        rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr right_motor_pub_;
+        rclcpp::Publisher<xrf2_msgs::msg::Ros2Xeno>::SharedPtr motor_pub_;
         rclcpp::TimerBase::SharedPtr pub_timer_;
 
         rclcpp::Time init_time;
         float pub_freq_;
         size_t depth_;
         std::string velocity_test_;
-        float left_motor_setpoint_vel;
-        float right_motor_setpoint_vel;
-        std_msgs::msg::Float64 left_msg;
-        std_msgs::msg::Float64 right_msg;
+        xrf2_msgs::msg::Ros2Xeno motor_msg;
 };
 
 #endif // ROSTESTBENCH_NODE_HPP

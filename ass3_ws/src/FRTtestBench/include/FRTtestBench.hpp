@@ -4,7 +4,17 @@
 #include "XenoFrt20Sim.hpp"
 #include "LoopController.h"
 
+#pragma pack (1)    //https://carlosvin.github.io/langs/en/posts/cpp-pragma-pack/#_performance_test
+struct ThisIsAStruct
+{
+    int this_is_a_int = 0;
+    double this_is_a_double = 100.0;
+    float this_is_a_float = 10.0;
+    char this_is_a_char = 'R';
+    bool this_is_a_bool = false;
+};
 
+#pragma pack(0)
 
 class FRTtestBench : public XenoFrt20Sim
 {

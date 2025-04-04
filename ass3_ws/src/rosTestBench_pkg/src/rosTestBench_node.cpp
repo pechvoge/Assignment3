@@ -9,10 +9,10 @@ RosTestBench_node::RosTestBench_node(const rclcpp::NodeOptions &options)
 void RosTestBench_node::initialize()
 {
     auto qos = rclcpp::QoS(depth_);
-    left_motor_pub_ = this->create_publisher<std_msgs::msg::Float64>("left_motor_setpoint_vel", qos);
-    right_motor_pub_ = this->create_publisher<std_msgs::msg::Float64>("right_motor_setpoint_vel", qos);
-    left_motor_setpoint_vel = 0.0;
-    right_motor_setpoint_vel = 0.0;
+    motor_pub_ = this->create_publisher<xrf2_msgs::msg::Ros2Xeno>("Ros2Xeno", qos);
+    // right_motor_pub_ = this->create_publisher<std_msgs::msg::Float64>("Ros2Xeno", qos);
+    motor_msg.left_motor_setpoint_vel = 0.0;
+    motor_msg.right_motor_setpoint_vel = 0.0;
     pub_freq_ = this->get_parameter("pub_freq").as_double();
     init_time = get_clock()->now();
     pub_timer_ = this->create_wall_timer(
@@ -47,28 +47,20 @@ void RosTestBench_node::publisherCallback()
 
 void RosTestBench_node::constant_velocity()
 {
-    left_motor_setpoint_vel = 0.5;
-    right_motor_setpoint_vel = 0.5;
+    motor_msg.left_motor_setpoint_vel = 0.5;
+    motor_msg.right_motor_setpoint_vel = 0.5;
 
-    left_msg.data = left_motor_setpoint_vel;
-    right_msg.data = right_motor_setpoint_vel;
- 
-    left_motor_pub_->publish(left_msg);
-    right_motor_pub_->publish(right_msg);
+    motor_pub_->publish(motor_msg);
 }
  
 void RosTestBench_node::sinusoidal_velocity()
 {
     auto time = get_clock()->now();
  
-    left_motor_setpoint_vel = 0.5 * sin(0.1 * time.seconds());
-    right_motor_setpoint_vel = 0.5 * sin(0.1 * time.seconds());
-
-    left_msg.data = left_motor_setpoint_vel;
-    right_msg.data = right_motor_setpoint_vel;
+    motor_msg.left_motor_setpoint_vel = 0.5 * sin(0.1 * time.seconds());
+    motor_msg.right_motor_setpoint_vel = 0.5 * sin(0.1 * time.seconds());
  
-    left_motor_pub_->publish(left_msg);
-    right_motor_pub_->publish(right_msg);
+    motor_pub_->publish(motor_msg);
 }
  
 void RosTestBench_node::sequence_velocity()
@@ -77,35 +69,32 @@ void RosTestBench_node::sequence_velocity()
     float time_diff = (current_time - init_time).seconds();
     if (time_diff < 5)
     {
-        left_motor_setpoint_vel = 0.5;
-        right_motor_setpoint_vel = 0.0;
+        motor_msg.left_motor_setpoint_vel = 0.5;
+        motor_msg.right_motor_setpoint_vel = 0.0;
         RCLCPP_INFO(this->get_logger(), "Steering right");
     } else if (time_diff < 10)
     {
-        left_motor_setpoint_vel = 0.0;
-        right_motor_setpoint_vel = 0.5;
+        motor_msg.left_motor_setpoint_vel = 0.0;
+        motor_msg.right_motor_setpoint_vel = 0.5;
         RCLCPP_INFO(this->get_logger(), "Steering left");
     } else if (time_diff < 15)
     {
-        left_motor_setpoint_vel = 0.5;
-        right_motor_setpoint_vel = 0.5;
+        motor_msg.left_motor_setpoint_vel = 0.5;
+        motor_msg.right_motor_setpoint_vel = 0.5;
         RCLCPP_INFO(this->get_logger(), "Driving forward");
     } else if (time_diff < 20)
     {
-        left_motor_setpoint_vel = -0.5;
-        right_motor_setpoint_vel = -0.5;
+        motor_msg.left_motor_setpoint_vel = -0.5;
+        motor_msg.right_motor_setpoint_vel = -0.5;
         RCLCPP_INFO(this->get_logger(), "Driving backward");
     } else
     {
-        left_motor_setpoint_vel = 0.0;
-        right_motor_setpoint_vel = 0.0;
+        motor_msg.left_motor_setpoint_vel = 0.0;
+        motor_msg.right_motor_setpoint_vel = 0.0;
         init_time = get_clock()->now();
     }
-    left_msg.data = left_motor_setpoint_vel;
-    right_msg.data = right_motor_setpoint_vel;
  
-    left_motor_pub_->publish(left_msg);
-    right_motor_pub_->publish(right_msg);
+    motor_pub_->publish(motor_msg);
 }
 
 
