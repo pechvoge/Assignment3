@@ -36,7 +36,7 @@ class SequenceController : public rclcpp::Node {
             std::bind(&SequenceController::sequence_controller, this));
 
         this->declare_parameter("gain", 0.2);
-        this->declare_parameter("width", 360);
+        this->declare_parameter("width", 320);
     }
 
   private:
