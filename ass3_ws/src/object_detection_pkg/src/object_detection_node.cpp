@@ -29,8 +29,8 @@ void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::Shared
     cv::inRange(hsv_image,cv::Scalar(low_H,low_S,low_V),cv::Scalar(high_H,high_S,high_V),thresholded_image); 
     cv::Moments mom = cv::moments(thresholded_image, true);
     geometry_msgs::msg::Point CoG;
-    CoG.x = mom.m10 / mom.m00 + 90; 
-    CoG.y = mom.m01 / mom.m00 + 90;
+    CoG.x = mom.m10 / mom.m00; 
+    CoG.y = mom.m01 / mom.m00;
     CoG.z = 0;
 
     if(CoG.x != CoG.x || CoG.y != CoG.y){

@@ -13,6 +13,7 @@ public:
     ~FRTtestBench();
 private:
     XenoFileHandler file;
+    struct ThisIsAStruct data_to_be_logged;
     LoopController controller;
 
     double u[0+1];
