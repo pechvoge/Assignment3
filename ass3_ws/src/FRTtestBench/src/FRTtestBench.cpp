@@ -73,9 +73,9 @@ int FRTtestBench::run()
     monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
     monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
 
-    // Set motor outputs to 25% of max
-    // actuate_data.pwm1 = 2047 * 0.25;
-    // actuate_data.pwm2 = 2047 * -0.25;
+    // Set motor outputs to setpoint velocities
+    actuate_data.pwm1 = 2047.0 * ros_msg.left_motor_setpoint_vel;
+    actuate_data.pwm2 = 2047.0 * ros_msg.right_motor_setpoint_vel;
 
     controller.Calculate(u, y);
     if(controller.IsFinished())
