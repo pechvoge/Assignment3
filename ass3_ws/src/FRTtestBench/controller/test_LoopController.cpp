@@ -3,10 +3,10 @@
  *
  *  file:  test_LoopController.cpp
  *  subm:  LoopController
- *  model: RELbotSimple (1)
- *  expmt: RELbotSimple (1)
- *  date:  March 31, 2025
- *  time:  5:17:53 PM
+ *  model: RELbotSimple (2)
+ *  expmt: RELbotSimple (2)
+ *  date:  April 7, 2025
+ *  time:  3:16:33 PM
  *  user:  Vakgroep RaM
  *  from:  -
  *  build: 5.1.4.13773
@@ -29,11 +29,17 @@
 /* the main function */
 int main()
 {
-	XXDouble u [0 + 1];
-	XXDouble y [0 + 1];
+	XXDouble u [4 + 1];
+	XXDouble y [2 + 1];
 
 	/* initialize the inputs and outputs with correct initial values */
+	u[0] = 0.0;		/* PosLeft */
+	u[1] = 0.0;		/* PosRight */
+	u[2] = 0.0;		/* SetVelLeft */
+	u[3] = 0.0;		/* SetVelRight */
 
+	y[0] = 0.0;		/* SteerLeft */
+	y[1] = 0.0;		/* SteerRight */
 
 
 	LoopController my20simSubmodel;

@@ -3,10 +3,10 @@
  *
  *  file:  common\MotionProfiles.cpp
  *  subm:  LoopController
- *  model: RELbotSimple (1)
- *  expmt: RELbotSimple (1)
- *  date:  March 31, 2025
- *  time:  5:17:53 PM
+ *  model: RELbotSimple (2)
+ *  expmt: RELbotSimple (2)
+ *  date:  April 7, 2025
+ *  time:  3:16:33 PM
  *  user:  Vakgroep RaM
  *  from:  -
  *  build: 5.1.4.13773

@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tokens>
-	<token name="MODEL_NAME"><![CDATA[RELbotSimple (1)]]></token>
+	<token name="MODEL_NAME"><![CDATA[RELbotSimple (2)]]></token>
 	<token name="20SIM_DIR"><![CDATA[C:\Program Files (x86)\20-sim 5.1]]></token>
 	<token name="SUBMODEL_NAME"><![CDATA[LoopController]]></token>
 	<token name="ALGLOOP_NAMES"><![CDATA[	NULL]]></token>
 	<token name="ALGLOOP_NAMES2"><![CDATA[	NULL]]></token>
 	<token name="ALGLOOP_NAMES3"><![CDATA[]]></token>
 	<token name="ALGLOOP_UNITS"><![CDATA[]]></token>
-	<token name="ALIAS_EQUATIONS"><![CDATA[]]></token>
+	<token name="ALIAS_EQUATIONS"><![CDATA[	/* PlusMinus1\plus1 = PosSPLeft\output; */
+	m_V[21] = m_s[2];
+
+	/* PlusMinus\plus1 = PosSPRight\output; */
+	m_V[19] = m_s[3];
+
+	/* PID_Right\error = PID_Right\uI_state_dot; */
+	m_V[23] = m_R[1];
+
+	/* PID_Left\error = PID_Left\uI_state_dot; */
+	m_V[22] = m_R[0];
+
+	/* PlusMinus1\output = PID_Left\uI_state_dot; */
+	m_V[20] = m_R[0];
+
+	/* PlusMinus\output = PID_Right\uI_state_dot; */
+	m_V[18] = m_R[1];
+]]></token>
 	<token name="ALIAS_MATRIX_NAMES"><![CDATA[	NULL
 ]]></token>
 	<token name="ALIAS_MATRIX_NAMES2"><![CDATA[	NULL
@@ -15,10 +32,29 @@
 	<token name="ALIAS_MATRIX_NAMES3"><![CDATA[
 ]]></token>
 	<token name="ALIAS_MATRIX_UNITS"><![CDATA[]]></token>
-	<token name="ALIAS_VARIABLE_INDICES"><![CDATA[	-1]]></token>
-	<token name="ALIAS_VARIABLE_NAMES"><![CDATA[	NULL]]></token>
-	<token name="ALIAS_VARIABLE_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="ALIAS_VARIABLE_NAMES3"><![CDATA[]]></token>
+	<token name="ALIAS_VARIABLE_INDICES"><![CDATA[	0,	0,	1,	1,	2,	3
+]]></token>
+	<token name="ALIAS_VARIABLE_NAMES"><![CDATA[	"PID_Left\\error",
+	"PlusMinus1\\output",
+	"PID_Right\\error",
+	"PlusMinus\\output",
+	"PlusMinus1\\plus1",
+	"PlusMinus\\plus1"
+]]></token>
+	<token name="ALIAS_VARIABLE_NAMES2"><![CDATA[	"PID_Left_error",
+	"PlusMinus1_output",
+	"PID_Right_error",
+	"PlusMinus_output",
+	"PlusMinus1_plus1",
+	"PlusMinus_plus1"
+]]></token>
+	<token name="ALIAS_VARIABLE_NAMES3"><![CDATA[PID_Left\error
+PlusMinus1\output
+PID_Right\error
+PlusMinus\output
+PlusMinus1\plus1
+PlusMinus\plus1
+]]></token>
 	<token name="ALIAS_VARIABLE_UNITS"><![CDATA[]]></token>
 	<token name="COMPANY_NAME"><![CDATA[-]]></token>
 	<token name="CONSTANT_NAMES"><![CDATA[	NULL]]></token>
@@ -38,8 +74,55 @@
 	<token name="DEPSTATE_NAMES2"><![CDATA[	NULL]]></token>
 	<token name="DEPSTATE_NAMES3"><![CDATA[]]></token>
 	<token name="DEPSTATE_UNITS"><![CDATA[]]></token>
-	<token name="DYNAMIC_EQUATIONS"><![CDATA[]]></token>
-	<token name="EXPERIMENT_NAME"><![CDATA[RELbotSimple (1)]]></token>
+	<token name="DYNAMIC_EQUATIONS"><![CDATA[	/* PID_Left\uI = PID_Left\Ki * PID_Left\uI_state; */
+	m_V[3] = m_P[2] * m_s[0];
+
+	/* PID_Right\uI = PID_Right\Ki * PID_Right\uI_state; */
+	m_V[7] = m_P[5] * m_s[1];
+
+	/* PlusMinus1\minus1 = PosLeft; */
+	m_V[9] = m_V[12];
+
+	/* PlusMinus\minus1 = PosRight; */
+	m_V[8] = m_V[13];
+
+	/* PosSPLeft\input = SetVelLeft; */
+	m_R[2] = m_V[14];
+
+	/* PosSPRight\input = SetVelRight; */
+	m_R[3] = m_V[15];
+
+	/* PID_Left\error_dot_in = PosSPLeft\input - 1.0; */
+	m_V[16] = m_R[2] - 1.0;
+
+	/* PID_Right\error_dot_in = PosSPRight\input - 1.0; */
+	m_V[17] = m_R[3] - 1.0;
+
+	/* PID_Right\uI_state_dot = PosSPRight\output - PlusMinus\minus1; */
+	m_R[1] = m_s[3] - m_V[8];
+
+	/* PID_Left\uI_state_dot = PosSPLeft\output - PlusMinus1\minus1; */
+	m_R[0] = m_s[2] - m_V[9];
+
+	/* PID_Left\uD = PID_Left\Kd * PID_Left\error_dot_in; */
+	m_V[2] = m_P[1] * m_V[16];
+
+	/* PID_Right\uD = PID_Right\Kd * PID_Right\error_dot_in; */
+	m_V[6] = m_P[4] * m_V[17];
+
+	/* PID_Left\uP = PID_Left\Kp * PID_Left\uI_state_dot; */
+	m_V[1] = m_P[0] * m_R[0];
+
+	/* PID_Left\steering = (PID_Left\uP + PID_Left\uD) + PID_Left\uI; */
+	m_V[0] = (m_V[1] + m_V[2]) + m_V[3];
+
+	/* PID_Right\uP = PID_Right\Kp * PID_Right\uI_state_dot; */
+	m_V[5] = m_P[3] * m_R[1];
+
+	/* PID_Right\steering = (PID_Right\uP + PID_Right\uD) + PID_Right\uI; */
+	m_V[4] = (m_V[5] + m_V[6]) + m_V[7];
+]]></token>
+	<token name="EXPERIMENT_NAME"><![CDATA[RELbotSimple (2)]]></token>
 	<token name="EXPORT_NAMES"><![CDATA[	NULL]]></token>
 	<token name="EXPORT_NAMES2"><![CDATA[	NULL]]></token>
 	<token name="EXPORT_NAMES3"><![CDATA[]]></token>
@@ -59,37 +142,102 @@
 	<token name="FINISH_TIME"><![CDATA[10.0]]></token>
 	<token name="FLOATPOSTFIX"><![CDATA[]]></token>
 	<token name="GENERATION_BUILD"><![CDATA[5.1.4.13773]]></token>
-	<token name="GENERATION_DATE"><![CDATA[March 31, 2025]]></token>
-	<token name="GENERATION_DIR"><![CDATA[C:\Users\jesse\Documents\Master Robotics\Module 3\Advanced Software Engineering\Assignment 3\20SimCode]]></token>
-	<token name="GENERATION_TIME"><![CDATA[5:17:53 PM]]></token>
+	<token name="GENERATION_DATE"><![CDATA[April 7, 2025]]></token>
+	<token name="GENERATION_DIR"><![CDATA[C:\Users\jesse\Documents\Master Robotics\Module 3\Advanced Software Engineering\Assignment 3\Nieuwe map]]></token>
+	<token name="GENERATION_TIME"><![CDATA[3:16:33 PM]]></token>
 	<token name="HIERARCHICAL_SUBMODEL_NAME"><![CDATA[LoopController]]></token>
 	<token name="IMPORT_NAMES"><![CDATA[	NULL]]></token>
 	<token name="IMPORT_NAMES2"><![CDATA[	NULL]]></token>
 	<token name="IMPORT_NAMES3"><![CDATA[]]></token>
 	<token name="IMPORT_UNITS"><![CDATA[]]></token>
 	<token name="INITIAL_EQUATIONS"><![CDATA[]]></token>
-	<token name="INITIAL_VALUE_NAMES"><![CDATA[	NULL]]></token>
-	<token name="INITIAL_VALUE_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="INITIAL_VALUE_NAMES3"><![CDATA[]]></token>
-	<token name="INITIAL_VALUE_UNITS"><![CDATA[]]></token>
-	<token name="INITIAL_VALUE_VALUES"><![CDATA[]]></token>
+	<token name="INITIAL_VALUE_NAMES"><![CDATA[	"PID_Left\\uI_state_initial",
+	"PID_Right\\uI_state_initial",
+	"PosSPLeft\\initial",
+	"PosSPRight\\initial"
+]]></token>
+	<token name="INITIAL_VALUE_NAMES2"><![CDATA[	"PID_Left_uI_state_initial",
+	"PID_Right_uI_state_initial",
+	"PosSPLeft_initial",
+	"PosSPRight_initial"
+]]></token>
+	<token name="INITIAL_VALUE_NAMES3"><![CDATA[PID_Left\uI_state_initial
+PID_Right\uI_state_initial
+PosSPLeft\initial
+PosSPRight\initial
+]]></token>
+	<token name="INITIAL_VALUE_UNITS"><![CDATA[
+
+
+
+]]></token>
+	<token name="INITIAL_VALUE_VALUES"><![CDATA[0.0
+0.0
+0.0
+0.0
+]]></token>
 	<token name="INITIALIZE_ALIAS_MATRICES"><![CDATA[]]></token>
 	<token name="INITIALIZE_CONSTANTS"><![CDATA[]]></token>
 	<token name="INITIALIZE_FAVORITE_PARS"><![CDATA[]]></token>
 	<token name="INITIALIZE_FAVORITE_VARS"><![CDATA[]]></token>
-	<token name="INITIALIZE_INITIAL_VALUES"><![CDATA[]]></token>
-	<token name="INITIALIZE_INPUTS"><![CDATA[]]></token>
+	<token name="INITIALIZE_INITIAL_VALUES"><![CDATA[	m_I[0] = 0.0;		/* PID_Left\uI_state_initial */
+	m_I[1] = 0.0;		/* PID_Right\uI_state_initial */
+	m_I[2] = 0.0;		/* PosSPLeft\initial */
+	m_I[3] = 0.0;		/* PosSPRight\initial */
+]]></token>
+	<token name="INITIALIZE_INPUTS"><![CDATA[	u[0] = 0.0;		/* PosLeft */
+	u[1] = 0.0;		/* PosRight */
+	u[2] = 0.0;		/* SetVelLeft */
+	u[3] = 0.0;		/* SetVelRight */
+]]></token>
 	<token name="INITIALIZE_MATRICES"><![CDATA[]]></token>
-	<token name="INITIALIZE_OUTPUTS"><![CDATA[]]></token>
-	<token name="INITIALIZE_PARAMETERS"><![CDATA[]]></token>
-	<token name="INITIALIZE_PARAMETERS2"><![CDATA[]]></token>
-	<token name="INITIALIZE_STATES"><![CDATA[]]></token>
+	<token name="INITIALIZE_OUTPUTS"><![CDATA[	y[0] = 0.0;		/* SteerLeft */
+	y[1] = 0.0;		/* SteerRight */
+]]></token>
+	<token name="INITIALIZE_PARAMETERS"><![CDATA[	m_P[0] = 644.0;		/* PID_Left\Kp {} */
+	m_P[1] = 0.5;		/* PID_Left\Kd {} */
+	m_P[2] = 3.9;		/* PID_Left\Ki {} */
+	m_P[3] = 644.0;		/* PID_Right\Kp {} */
+	m_P[4] = 0.5;		/* PID_Right\Kd {} */
+	m_P[5] = 3.9;		/* PID_Right\Ki {} */
+]]></token>
+	<token name="INITIALIZE_PARAMETERS2"><![CDATA[		644.0 /* PID_Left\Kp {} */, 
+		0.5 /* PID_Left\Kd {} */, 
+		3.9 /* PID_Left\Ki {} */, 
+		644.0 /* PID_Right\Kp {} */, 
+		0.5 /* PID_Right\Kd {} */, 
+		3.9 /* PID_Right\Ki {} */]]></token>
+	<token name="INITIALIZE_STATES"><![CDATA[	m_s[0] = m_I[0];		/* PID_Left\uI_state */
+	m_s[1] = m_I[1];		/* PID_Right\uI_state */
+	m_s[2] = m_I[2];		/* PosSPLeft\output */
+	m_s[3] = m_I[3];		/* PosSPRight\output */
+]]></token>
 	<token name="INPUT_EQUATIONS"><![CDATA[]]></token>
-	<token name="INPUT_NAMES"><![CDATA[	NULL]]></token>
-	<token name="INPUT_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="INPUT_NAMES3"><![CDATA[]]></token>
-	<token name="INPUT_TO_VARIABLE_EQUATIONS"><![CDATA[]]></token>
-	<token name="INPUT_UNITS"><![CDATA[]]></token>
+	<token name="INPUT_NAMES"><![CDATA[	"PosLeft",
+	"PosRight",
+	"SetVelLeft",
+	"SetVelRight"
+]]></token>
+	<token name="INPUT_NAMES2"><![CDATA[	"PosLeft",
+	"PosRight",
+	"SetVelLeft",
+	"SetVelRight"
+]]></token>
+	<token name="INPUT_NAMES3"><![CDATA[PosLeft
+PosRight
+SetVelLeft
+SetVelRight
+]]></token>
+	<token name="INPUT_TO_VARIABLE_EQUATIONS"><![CDATA[	m_V[12] = u[0];		/* PosLeft */
+	m_V[13] = u[1];		/* PosRight */
+	m_V[14] = u[2];		/* SetVelLeft */
+	m_V[15] = u[3];		/* SetVelRight */
+]]></token>
+	<token name="INPUT_UNITS"><![CDATA[
+
+
+
+]]></token>
 	<token name="MATRIX_NAMES"><![CDATA[	NULL
 ]]></token>
 	<token name="MATRIX_NAMES2"><![CDATA[	NULL
@@ -98,12 +246,12 @@
 ]]></token>
 	<token name="MATRIX_UNITS"><![CDATA[]]></token>
 	<token name="MODEL_DESCRIPTION"><![CDATA[]]></token>
-	<token name="MODEL_FILE"><![CDATA[C:\Users\jesse\Downloads\RELbotSimple (1).emx]]></token>
-	<token name="MODEL_FUNCTION_NAME"><![CDATA[RELbotSimple1]]></token>
+	<token name="MODEL_FILE"><![CDATA[C:\Users\jesse\Downloads\RELbotSimple (2).emx]]></token>
+	<token name="MODEL_FUNCTION_NAME"><![CDATA[RELbotSimple2]]></token>
 	<token name="MODEL_IS_DISCRETE"><![CDATA[0]]></token>
 	<token name="NUMBER_ALGLOOPS"><![CDATA[0]]></token>
 	<token name="NUMBER_ALIAS_MATRICES"><![CDATA[0]]></token>
-	<token name="NUMBER_ALIAS_VARIABLES"><![CDATA[0]]></token>
+	<token name="NUMBER_ALIAS_VARIABLES"><![CDATA[6]]></token>
 	<token name="NUMBER_CONSTANTS"><![CDATA[0]]></token>
 	<token name="NUMBER_CONSTRAINTS"><![CDATA[0]]></token>
 	<token name="NUMBER_DEPSTATES"><![CDATA[0]]></token>
@@ -111,14 +259,14 @@
 	<token name="NUMBER_FAVORITE_PARAMETERS"><![CDATA[0]]></token>
 	<token name="NUMBER_FAVORITE_VARIABLES"><![CDATA[0]]></token>
 	<token name="NUMBER_IMPORTS"><![CDATA[0]]></token>
-	<token name="NUMBER_INITIAL_VALUES"><![CDATA[0]]></token>
-	<token name="NUMBER_INPUTS"><![CDATA[0]]></token>
+	<token name="NUMBER_INITIAL_VALUES"><![CDATA[4]]></token>
+	<token name="NUMBER_INPUTS"><![CDATA[4]]></token>
 	<token name="NUMBER_MATRICES"><![CDATA[0]]></token>
-	<token name="NUMBER_OUTPUTS"><![CDATA[0]]></token>
-	<token name="NUMBER_PARAMETERS"><![CDATA[0]]></token>
-	<token name="NUMBER_STATES"><![CDATA[0]]></token>
+	<token name="NUMBER_OUTPUTS"><![CDATA[2]]></token>
+	<token name="NUMBER_PARAMETERS"><![CDATA[6]]></token>
+	<token name="NUMBER_STATES"><![CDATA[4]]></token>
 	<token name="NUMBER_UNNAMED"><![CDATA[0]]></token>
-	<token name="NUMBER_VARIABLES"><![CDATA[0]]></token>
+	<token name="NUMBER_VARIABLES"><![CDATA[18]]></token>
 	<token name="NUMBEROF_ABSFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_ADJOINTFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_ALGEBRAICFUNCTION"><![CDATA[0]]></token>
@@ -132,7 +280,7 @@
 	<token name="NUMBEROF_ARCSINHYPERBOLICFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_ARCTANFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_ARCTANHYPERBOLICFUNCTION"><![CDATA[0]]></token>
-	<token name="NUMBEROF_ASSIGNMENT"><![CDATA[0]]></token>
+	<token name="NUMBEROF_ASSIGNMENT"><![CDATA[10]]></token>
 	<token name="NUMBEROF_ATAN2FUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_BACKDIVISION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_BITAND"><![CDATA[0]]></token>
@@ -185,7 +333,7 @@
 	<token name="NUMBEROF_ENERGYFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_EQUAL"><![CDATA[0]]></token>
 	<token name="NUMBEROF_EQUALSTATEMENT"><![CDATA[0]]></token>
-	<token name="NUMBEROF_EQUATION"><![CDATA[0]]></token>
+	<token name="NUMBEROF_EQUATION"><![CDATA[14]]></token>
 	<token name="NUMBEROF_EVENTDOWNFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_EVENTFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_EVENTUPFUNCTION"><![CDATA[0]]></token>
@@ -218,7 +366,7 @@
 	<token name="NUMBEROF_IMPULSEFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_INITIALFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_INITIALSTATEMENT"><![CDATA[0]]></token>
-	<token name="NUMBEROF_INITIALVALUE"><![CDATA[0]]></token>
+	<token name="NUMBEROF_INITIALVALUE"><![CDATA[4]]></token>
 	<token name="NUMBEROF_INNERFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_INTFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_INVERSEFUNCTION"><![CDATA[0]]></token>
@@ -229,17 +377,17 @@
 	<token name="NUMBEROF_LIMINTFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_LIMITFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_LINEARSOLVEFUNCTION"><![CDATA[0]]></token>
-	<token name="NUMBEROF_LITERAL"><![CDATA[0]]></token>
+	<token name="NUMBEROF_LITERAL"><![CDATA[4]]></token>
 	<token name="NUMBEROF_LOG10FUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_LOG2FUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_LOGFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_MAJOR"><![CDATA[0]]></token>
 	<token name="NUMBEROF_MAJORADJOINTFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_MAXFUNCTION"><![CDATA[0]]></token>
-	<token name="NUMBEROF_MIN"><![CDATA[0]]></token>
+	<token name="NUMBEROF_MIN"><![CDATA[6]]></token>
 	<token name="NUMBEROF_MINFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_MODULO"><![CDATA[0]]></token>
-	<token name="NUMBEROF_MUL"><![CDATA[0]]></token>
+	<token name="NUMBEROF_MUL"><![CDATA[6]]></token>
 	<token name="NUMBEROF_MULTIPLYHOMOGENEOUSFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_NEXTFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_NONLINEARFUNCTION"><![CDATA[0]]></token>
@@ -247,10 +395,10 @@
 	<token name="NUMBEROF_NORMINFFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_NOTEQUAL"><![CDATA[0]]></token>
 	<token name="NUMBEROF_OR"><![CDATA[0]]></token>
-	<token name="NUMBEROF_PARAMETER"><![CDATA[0]]></token>
-	<token name="NUMBEROF_PLUS"><![CDATA[0]]></token>
-	<token name="NUMBEROF_PORT"><![CDATA[0]]></token>
-	<token name="NUMBEROF_PORTVARIABLE"><![CDATA[0]]></token>
+	<token name="NUMBEROF_PARAMETER"><![CDATA[6]]></token>
+	<token name="NUMBEROF_PLUS"><![CDATA[4]]></token>
+	<token name="NUMBEROF_PORT"><![CDATA[20]]></token>
+	<token name="NUMBEROF_PORTVARIABLE"><![CDATA[16]]></token>
 	<token name="NUMBEROF_POWER"><![CDATA[0]]></token>
 	<token name="NUMBEROF_PREFIXMIN"><![CDATA[0]]></token>
 	<token name="NUMBEROF_PREFIXNOT"><![CDATA[0]]></token>
@@ -259,7 +407,7 @@
 	<token name="NUMBEROF_RAMPFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_RANDOM"><![CDATA[0]]></token>
 	<token name="NUMBEROF_RANDOMFUNCTION"><![CDATA[0]]></token>
-	<token name="NUMBEROF_RATE"><![CDATA[0]]></token>
+	<token name="NUMBEROF_RATE"><![CDATA[4]]></token>
 	<token name="NUMBEROF_REALTIME"><![CDATA[0]]></token>
 	<token name="NUMBEROF_REPEATSTATEMENT"><![CDATA[0]]></token>
 	<token name="NUMBEROF_RESETFUNCTION"><![CDATA[0]]></token>
@@ -278,7 +426,7 @@
 	<token name="NUMBEROF_SQRFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_SQRTFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_STARTTIME"><![CDATA[0]]></token>
-	<token name="NUMBEROF_STATE"><![CDATA[0]]></token>
+	<token name="NUMBEROF_STATE"><![CDATA[4]]></token>
 	<token name="NUMBEROF_STATERATE"><![CDATA[0]]></token>
 	<token name="NUMBEROF_STEPFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_STEPSIZE"><![CDATA[0]]></token>
@@ -305,38 +453,187 @@
 	<token name="NUMBEROF_TRUE"><![CDATA[0]]></token>
 	<token name="NUMBEROF_TRUNCFUNCTION"><![CDATA[0]]></token>
 	<token name="NUMBEROF_TYPEPARAMETER"><![CDATA[0]]></token>
-	<token name="NUMBEROF_UNNAMED"><![CDATA[0]]></token>
-	<token name="NUMBEROF_VARIABLE"><![CDATA[0]]></token>
+	<token name="NUMBEROF_UNNAMED"><![CDATA[2]]></token>
+	<token name="NUMBEROF_VARIABLE"><![CDATA[8]]></token>
 	<token name="NUMBEROF_WARNSTATEMENT"><![CDATA[0]]></token>
 	<token name="NUMBEROF_WHILESTATEMENT"><![CDATA[0]]></token>
 	<token name="NUMBEROF_XOR"><![CDATA[0]]></token>
-	<token name="OUTPUT_EQUATIONS"><![CDATA[]]></token>
-	<token name="OUTPUT_NAMES"><![CDATA[	NULL]]></token>
-	<token name="OUTPUT_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="OUTPUT_NAMES3"><![CDATA[]]></token>
-	<token name="OUTPUT_UNITS"><![CDATA[]]></token>
-	<token name="PARAMETER_NAMES"><![CDATA[	NULL]]></token>
-	<token name="PARAMETER_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="PARAMETER_NAMES3"><![CDATA[]]></token>
-	<token name="PARAMETER_UNITS"><![CDATA[]]></token>
-	<token name="PARAMETER_VALUES"><![CDATA[]]></token>
-	<token name="RATE_NAMES"><![CDATA[	NULL]]></token>
-	<token name="RATE_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="RATE_NAMES3"><![CDATA[]]></token>
-	<token name="RATE_UNITS"><![CDATA[]]></token>
+	<token name="OUTPUT_EQUATIONS"><![CDATA[	/* SteerLeft = PID_Left\steering; */
+	m_V[10] = m_V[0];
+
+	/* SteerRight = PID_Right\steering; */
+	m_V[11] = m_V[4];
+]]></token>
+	<token name="OUTPUT_NAMES"><![CDATA[	"SteerLeft",
+	"SteerRight"
+]]></token>
+	<token name="OUTPUT_NAMES2"><![CDATA[	"SteerLeft",
+	"SteerRight"
+]]></token>
+	<token name="OUTPUT_NAMES3"><![CDATA[SteerLeft
+SteerRight
+]]></token>
+	<token name="OUTPUT_UNITS"><![CDATA[
+
+]]></token>
+	<token name="PARAMETER_NAMES"><![CDATA[	"PID_Left\\Kp",
+	"PID_Left\\Kd",
+	"PID_Left\\Ki",
+	"PID_Right\\Kp",
+	"PID_Right\\Kd",
+	"PID_Right\\Ki"
+]]></token>
+	<token name="PARAMETER_NAMES2"><![CDATA[	"PID_Left_Kp",
+	"PID_Left_Kd",
+	"PID_Left_Ki",
+	"PID_Right_Kp",
+	"PID_Right_Kd",
+	"PID_Right_Ki"
+]]></token>
+	<token name="PARAMETER_NAMES3"><![CDATA[PID_Left\Kp
+PID_Left\Kd
+PID_Left\Ki
+PID_Right\Kp
+PID_Right\Kd
+PID_Right\Ki
+]]></token>
+	<token name="PARAMETER_UNITS"><![CDATA[
+
+
+
+
+
+]]></token>
+	<token name="PARAMETER_VALUES"><![CDATA[644.0
+0.5
+3.9
+644.0
+0.5
+3.9
+]]></token>
+	<token name="RATE_NAMES"><![CDATA[	"",
+	"",
+	"PosSPLeft\\input",
+	"PosSPRight\\input"
+]]></token>
+	<token name="RATE_NAMES2"><![CDATA[	"",
+	"",
+	"PosSPLeft_input",
+	"PosSPRight_input"
+]]></token>
+	<token name="RATE_NAMES3"><![CDATA[
+
+PosSPLeft\input
+PosSPRight\input
+]]></token>
+	<token name="RATE_UNITS"><![CDATA[
+
+
+
+]]></token>
 	<token name="START_TIME"><![CDATA[0.0]]></token>
-	<token name="STATE_NAMES"><![CDATA[	NULL]]></token>
-	<token name="STATE_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="STATE_NAMES3"><![CDATA[]]></token>
-	<token name="STATE_UNITS"><![CDATA[]]></token>
+	<token name="STATE_NAMES"><![CDATA[	"",
+	"",
+	"PosSPLeft\\output",
+	"PosSPRight\\output"
+]]></token>
+	<token name="STATE_NAMES2"><![CDATA[	"",
+	"",
+	"PosSPLeft_output",
+	"PosSPRight_output"
+]]></token>
+	<token name="STATE_NAMES3"><![CDATA[
+
+PosSPLeft\output
+PosSPRight\output
+]]></token>
+	<token name="STATE_UNITS"><![CDATA[
+
+
+
+]]></token>
 	<token name="STATIC_EQUATIONS"><![CDATA[]]></token>
 	<token name="TIME_STEP_SIZE"><![CDATA[0.01]]></token>
 	<token name="USER_NAME"><![CDATA[Vakgroep RaM]]></token>
-	<token name="VARIABLE_NAMES"><![CDATA[	NULL]]></token>
-	<token name="VARIABLE_NAMES2"><![CDATA[	NULL]]></token>
-	<token name="VARIABLE_NAMES3"><![CDATA[]]></token>
-	<token name="VARIABLE_TO_OUTPUT_EQUATIONS"><![CDATA[]]></token>
-	<token name="VARIABLE_UNITS"><![CDATA[]]></token>
+	<token name="VARIABLE_NAMES"><![CDATA[	"PID_Left\\steering",
+	"",
+	"",
+	"",
+	"PID_Right\\steering",
+	"",
+	"",
+	"",
+	"PlusMinus\\minus1",
+	"PlusMinus1\\minus1",
+	"SteerLeft",
+	"SteerRight",
+	"PosLeft",
+	"PosRight",
+	"SetVelLeft",
+	"SetVelRight",
+	"PID_Left\\error_dot_in",
+	"PID_Right\\error_dot_in"
+]]></token>
+	<token name="VARIABLE_NAMES2"><![CDATA[	"PID_Left_steering",
+	"",
+	"",
+	"",
+	"PID_Right_steering",
+	"",
+	"",
+	"",
+	"PlusMinus_minus1",
+	"PlusMinus1_minus1",
+	"SteerLeft",
+	"SteerRight",
+	"PosLeft",
+	"PosRight",
+	"SetVelLeft",
+	"SetVelRight",
+	"PID_Left_error_dot_in",
+	"PID_Right_error_dot_in"
+]]></token>
+	<token name="VARIABLE_NAMES3"><![CDATA[PID_Left\steering
+
+
+
+PID_Right\steering
+
+
+
+PlusMinus\minus1
+PlusMinus1\minus1
+SteerLeft
+SteerRight
+PosLeft
+PosRight
+SetVelLeft
+SetVelRight
+PID_Left\error_dot_in
+PID_Right\error_dot_in
+]]></token>
+	<token name="VARIABLE_TO_OUTPUT_EQUATIONS"><![CDATA[	y[0] = 	m_V[10];		/* SteerLeft */
+	y[1] = 	m_V[11];		/* SteerRight */
+]]></token>
+	<token name="VARIABLE_UNITS"><![CDATA[
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]></token>
 	<token name="WORK_ARRAY_SIZE"><![CDATA[0]]></token>
 	<token name="XX_ALG_IN_ARRAY_NAME"><![CDATA[A]]></token>
 	<token name="XX_ALG_OUT_ARRAY_NAME"><![CDATA[a]]></token>
@@ -363,6 +660,7 @@
 	<token name="RELATIVE_TOLERANCE"><![CDATA[1e-05]]></token>
 	<token name="INITIAL_STEPSIZE"><![CDATA[0]]></token>
 	<token name="MAXIMUM_STEPSIZE"><![CDATA[0]]></token>
+	<token name="EVENT_DELTA"><![CDATA[1e-06]]></token>
 	<token name="FORMAJORVERSION"><![CDATA[4]]></token>
 	<token name="FORMINORVERSION"><![CDATA[5]]></token>
 	<token name="FORMAJORBUILD"><![CDATA[0]]></token>
@@ -734,6 +1032,7 @@ ABSOLUTE_TOLERANCE
 RELATIVE_TOLERANCE
 INITIAL_STEPSIZE
 MAXIMUM_STEPSIZE
+EVENT_DELTA
 FORMAJORVERSION
 FORMINORVERSION
 FORMAJORBUILD

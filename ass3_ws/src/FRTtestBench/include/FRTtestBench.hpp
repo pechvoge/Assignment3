@@ -26,8 +26,8 @@ private:
     struct ThisIsAStruct data_to_be_logged;
     LoopController controller;
 
-    double u[0+1];
-    double y[0+1];
+    double u[4];
+    double y[2];
 protected:
     //Functions
     int initialising() override;
