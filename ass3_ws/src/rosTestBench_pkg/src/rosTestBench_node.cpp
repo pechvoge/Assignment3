@@ -26,14 +26,17 @@ void RosTestBench_node::publisherCallback()
     
     if (velocity_test_ == "constant_velocity")
     {
+        RCLCPP_INFO(this->get_logger(), "Hello from constant_velocity test");
         constant_velocity();
     }
     else if (velocity_test_ == "sinusoidal_velocity")
     {
+        RCLCPP_INFO(this->get_logger(), "Hello from sinusoidal_velocity test");
         sinusoidal_velocity();
     }
     else if (velocity_test_ == "sequence_velocity")
     {
+        RCLCPP_INFO(this->get_logger(), "Hello from sequence_velocity test");
         sequence_velocity();
     }
     else

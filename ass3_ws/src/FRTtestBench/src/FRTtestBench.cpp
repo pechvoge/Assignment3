@@ -7,11 +7,11 @@ FRTtestBench::FRTtestBench(uint write_decimator_freq, uint monitor_freq) :
 {
      printf("%s: Constructing rampio\n", __FUNCTION__);
     // Add variables to logger to be logged, has to be done before you can log data
-    logger.addVariable("this_is_a_int", integer);
-    logger.addVariable("this_is_a_double", double_);
-    logger.addVariable("this_is_a_float", float_);
-    logger.addVariable("this_is_a_char", character);
-    logger.addVariable("this_is_a_bool", boolean);
+    // logger.addVariable("this_is_a_int", integer);
+    // logger.addVariable("this_is_a_double", double_);
+    // logger.addVariable("this_is_a_float", float_);
+    // logger.addVariable("this_is_a_char", character);
+    // logger.addVariable("this_is_a_bool", boolean);
     
     // To infinite run the controller, uncomment line below
     controller.SetFinishTime(0.0);
@@ -30,7 +30,7 @@ int FRTtestBench::initialising()
     evl_printf("Hello from initialising\n");      // Do something
 
     // The logger has to be initialised at only once
-    logger.initialise();
+    // logger.initialise();
     // The FPGA has to be initialised at least once
     ico_io.init();
 
@@ -53,19 +53,19 @@ int FRTtestBench::run()
     // Return 1 to go to stopping state
 
     // Start logger
-    logger.start();                             
+    // logger.start();                             
     monitor.printf("Hello from run\n");  
     //  Change some data for logger            
-    data_to_be_logged.this_is_a_bool = !data_to_be_logged.this_is_a_bool;
-    data_to_be_logged.this_is_a_int++;
-    if(data_to_be_logged.this_is_a_char == 'R')
-        data_to_be_logged.this_is_a_char = 'A';
-    else if (data_to_be_logged.this_is_a_char == 'A')
-        data_to_be_logged.this_is_a_char = 'M';
-    else
-        data_to_be_logged.this_is_a_char = 'R';
-    data_to_be_logged.this_is_a_float = data_to_be_logged.this_is_a_float/2;
-    data_to_be_logged.this_is_a_double = data_to_be_logged.this_is_a_double/4; 
+    // data_to_be_logged.this_is_a_bool = !data_to_be_logged.this_is_a_bool;
+    // data_to_be_logged.this_is_a_int++;
+    // if(data_to_be_logged.this_is_a_char == 'R')
+    //     data_to_be_logged.this_is_a_char = 'A';
+    // else if (data_to_be_logged.this_is_a_char == 'A')
+    //     data_to_be_logged.this_is_a_char = 'M';
+    // else
+    //     data_to_be_logged.this_is_a_char = 'R';
+    // data_to_be_logged.this_is_a_float = data_to_be_logged.this_is_a_float/2;
+    // data_to_be_logged.this_is_a_double = data_to_be_logged.this_is_a_double/4; 
 
     // Printf encoder 1 to 4 data
     monitor.printf("Encoder 1 value : %d\n",sample_data.channel1);
@@ -74,10 +74,15 @@ int FRTtestBench::run()
     monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
 
     // Set motor outputs to setpoint velocities
-    actuate_data.pwm1 = 2047.0 * ros_msg.left_motor_setpoint_vel;
-    actuate_data.pwm2 = 2047.0 * ros_msg.right_motor_setpoint_vel;
+    u[0] = 0.0;		/* PosLeft */
+	u[1] = 0.0;		/* PosRight */
+	u[2] = ros_msg.left_motor_setpoint_vel;		/* SetVelLeft */
+	u[3] = ros_msg.right_motor_setpoint_vel;		/* SetVelRight */
 
     controller.Calculate(u, y);
+    // Set motor outputs to setpoint velocities
+    actuate_data.pwm1 = 2047.0 * y[0]; // left motor
+    actuate_data.pwm2 = -2047.0 * y[1]; // right motor
     if(controller.IsFinished())
         return 1;
 
@@ -89,7 +94,7 @@ int FRTtestBench::stopping()
 {
     // Bring the physical system to a stop and set it in a state that the system can be deactivated
     // Return 1 to go to stopped state
-    logger.stop();                                // Stop logger
+    // logger.stop();                                // Stop logger
     evl_printf("Hello from stopping\n");          // Do something
 
     return 1;
