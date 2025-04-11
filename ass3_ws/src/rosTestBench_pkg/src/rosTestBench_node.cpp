@@ -107,21 +107,27 @@ void RosTestBench_node::sequence_velocity()
 
 void RosTestBench_node::custom_velocity()
 {
-    const int driving_time = 5; // seconds
-    const int steering_time = 2; // seconds
+    const float driving_time = 5.0; // seconds
+    const float steering_time = 2.0; // seconds
     auto time = get_clock()->now();
     float time_diff = (time - init_time).seconds();
     if (time_diff < driving_time){// drive forward for 5 seconds
         motor_msg.left_motor_setpoint_vel = 0.25;
         motor_msg.right_motor_setpoint_vel = 0.25;
+        RCLCPP_INFO(this->get_logger(), "Driving forward");
     } else if (time_diff < driving_time + steering_time){// steer for 5 seconds
         motor_msg.left_motor_setpoint_vel = 0.5*pi*d_relbot/steering_time;
         motor_msg.right_motor_setpoint_vel = 0.0;
+        RCLCPP_INFO(this->get_logger(), "Steering right");
     } else {
         motor_msg.left_motor_setpoint_vel = 0.0;
         motor_msg.right_motor_setpoint_vel = 0.0;
         init_time = get_clock()->now(); // reset the timer
+    
+        RCLCPP_INFO(this->get_logger(), "Stopping");
     }
+
+    motor_pub_->publish(motor_msg);
 }
 
 
@@ -129,6 +135,6 @@ void RosTestBench_node::parse_parameters()
 {
     depth_ = this->declare_parameter("depth", 1);
     pub_freq_ = this->declare_parameter("pub_freq", 33.0);
-    velocity_test_ = this->declare_parameter("velocity_test", "constant_velocity");
+    velocity_test_ = this->declare_parameter("velocity_test", "custom_velocity");
 }
 
