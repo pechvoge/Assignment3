@@ -52,11 +52,10 @@ class SequenceController : public rclcpp::Node {
         auto vel_left = std_msgs::msg::Float64();//std_msgs::msg::Float64
         auto vel_right = std_msgs::msg::Float64();//std_msgs::msg::Float64
 
-        vel_left.data = e;
-        vel_right.data = -e;
+        motor_msg.left_motor_setpoint_vel = e;
+        motor_msg.right_motor_setpoint_vel = -e;
 
-        publisher_left_->publish(vel_left);
-        publisher_right_->publish(vel_right);
+        motor_pub_->publish(motor_msg);
     }
 
     void update_light_pos(const geometry_msgs::msg::Point &msg) {
@@ -77,10 +76,13 @@ class SequenceController : public rclcpp::Node {
     rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr
         subscription_dim_;
 
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_left_; // std_msgs::msg::Float64
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_right_; //std_msgs::msg::Float64
+    rclcpp::Publisher<xrf2_msgs::msg::Ros2Xeno>::SharedPtr motor_pub_;
+    // rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_left_; // std_msgs::msg::Float64
+    // rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_right_; //std_msgs::msg::Float64
 
     rclcpp::TimerBase::SharedPtr timer_;
+
+    xrf2_msgs::msg::Ros2Xeno motor_msg;
 };
 
 int main(int argc, char *argv[]) {
