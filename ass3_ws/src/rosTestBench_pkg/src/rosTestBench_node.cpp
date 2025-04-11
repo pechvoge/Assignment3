@@ -39,6 +39,11 @@ void RosTestBench_node::publisherCallback()
         RCLCPP_INFO(this->get_logger(), "Hello from sequence_velocity test");
         sequence_velocity();
     }
+    else if (velocity_test_ == "custom_velocity")
+    {
+        RCLCPP_INFO(this->get_logger(), "Hello from custom_velocity test");
+        custom_velocity();
+    }
     else
     {
         RCLCPP_ERROR(this->get_logger(), "Invalid velocity test type");
@@ -100,6 +105,24 @@ void RosTestBench_node::sequence_velocity()
     motor_pub_->publish(motor_msg);
 }
 
+void RosTestBench_node::custom_velocity()
+{
+    const int driving_time = 5; // seconds
+    const int steering_time = 2; // seconds
+    auto time = get_clock()->now();
+    float time_diff = (time - init_time).seconds();
+    if (time_diff < driving_time){// drive forward for 5 seconds
+        motor_msg.left_motor_setpoint_vel = 0.25;
+        motor_msg.right_motor_setpoint_vel = 0.25;
+    } else if (time_diff < driving_time + steering_time){// steer for 5 seconds
+        motor_msg.left_motor_setpoint_vel = 0.5*pi*d_relbot/steering_time;
+        motor_msg.right_motor_setpoint_vel = 0.0;
+    } else {
+        motor_msg.left_motor_setpoint_vel = 0.0;
+        motor_msg.right_motor_setpoint_vel = 0.0;
+        init_time = get_clock()->now(); // reset the timer
+    }
+}
 
 
 void RosTestBench_node::parse_parameters()
