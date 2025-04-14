@@ -107,7 +107,7 @@ void RosTestBench_node::sequence_velocity()
 
 void RosTestBench_node::custom_velocity()
 {
-    const int driving_time = 5; // seconds
+    const int driving_time = 2; // seconds
     const int steering_time = 2; // seconds
     auto time = get_clock()->now();
     float time_diff = (time - init_time).seconds();
