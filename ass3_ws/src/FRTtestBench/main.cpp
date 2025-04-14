@@ -10,7 +10,7 @@ volatile bool exitBool = false;
 
 static void *XenoThread(void *arg)
 {
-    FRTtestBench example_rt(1,1); // communication frequency 1Hz, monitor frequency 1Hz
+    FRTtestBench example_rt(1,10); // communication frequency 1Hz, monitor frequency 1Hz
     evl_printf("starting the loop!!!\n");
     example_rt.loop();
     return NULL;
