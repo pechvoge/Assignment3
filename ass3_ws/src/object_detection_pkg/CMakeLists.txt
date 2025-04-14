@@ -11,6 +11,7 @@ find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core highgui imgproc videoio)
 
 add_library(${PROJECT_NAME} SHARED
@@ -28,7 +29,8 @@ target_link_libraries(${PROJECT_NAME}
   ${geometry_msgs_TARGETS}
   rclcpp_components::component
   ${OpenCV_LIBS}
-  cv_bridge::cv_bridge  
+  cv_bridge::cv_bridge
+  ${std_msgs_TARGETS}  
   )
 
 rclcpp_components_register_node(${PROJECT_NAME} PLUGIN "Object_detection_node" EXECUTABLE object_detection_node)

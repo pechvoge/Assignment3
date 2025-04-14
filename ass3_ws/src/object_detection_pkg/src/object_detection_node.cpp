@@ -13,6 +13,7 @@ void Object_detection_node::initialize(){
         "/image", qos, std::bind(&Object_detection_node::CoG_determiner, this, std::placeholders::_1));
 
     CoG_pub_ = this->create_publisher<geometry_msgs::msg::Point>("light_position", qos);  
+    white_pub_ = this->create_publisher<std_msgs::msg::Float64>("white_ratio", qos);
 
     low_H = 35, low_S = 100, low_V = 100;
     high_H = 85, high_S = 255, high_V = 255; 
@@ -39,6 +40,15 @@ void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::Shared
     }
     CoG_pub_->publish(CoG);
     //RCLCPP_INFO(get_logger(), "CoG is at (%f, %f)", CoG.x, CoG.y);
+
+    std_msgs::msg::Float64 white_msg_;
+
+    int white_pixels = cv::countNonZero(thresholded_image);
+    int total_pixels = thresholded_image.rows * thresholded_image.cols;
+    float white_ratio = (float)white_pixels / total_pixels; 
+    white_msg_.data = white_ratio;
+    white_pub_->publish(white_msg_);
+
     cv::imshow("object", thresholded_image);
     cv::waitKey(1);
 }

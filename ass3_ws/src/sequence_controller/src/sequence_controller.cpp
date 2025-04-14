@@ -24,6 +24,11 @@ class SequenceController : public rclcpp::Node {
                 "light_position", 10,
                 std::bind(&SequenceController::update_light_pos, this, _1));
 
+        subscription_white_ratio_ =
+            this->create_subscription<std_msgs::msg::Float64>(
+                "white_ratio", 10,
+                std::bind(&SequenceController::update_zoom, this, _1));
+
         publisher_left_ = this->create_publisher<std_msgs::msg::Float64>(
             "left_motor_setpoint_vel", 10);//std_msgs::msg::Float64
 
@@ -35,26 +40,29 @@ class SequenceController : public rclcpp::Node {
             std::chrono::duration<double>(sample_time_s_),
             std::bind(&SequenceController::sequence_controller, this));
 
-        this->declare_parameter("gain", 0.2);
+        this->declare_parameter("rotation_gain", 0.2);
+        this->declare_parameter("drive_gain", 0.1);
         this->declare_parameter("width", 320);
+        this->declare_parameter("zoom_threshold", 0.3);
     }
 
   private:
     void sequence_controller() {
-        auto gain = this->get_parameter("gain").as_double();
+        auto rotation_gain = this->get_parameter("rotation_gain").as_double();
+        auto drive_gain = this->get_parameter("drive_gain").as_double();
         auto width = this->get_parameter("width").as_int();
+        auto zoom_threshold = this->get_parameter("zoom_threshold").as_double();
 
-        double e = gain * (light_pos_.x - (width / 2));
+        double rotate = rotation_gain * (light_pos_.x - (width / 2));
 
-        RCLCPP_INFO(this->get_logger(), "light_pos.x: %f, e: %f", light_pos_.x,
-                    e);
+        RCLCPP_INFO(this->get_logger(), "light_pos.x: %f, rotate: %f", light_pos_.x,rotate);
 
-        auto vel_left = std_msgs::msg::Float64();//std_msgs::msg::Float64
-        auto vel_right = std_msgs::msg::Float64();//std_msgs::msg::Float64
+        double drive = - drive_gain * (white_ratio_.data - zoom_threshold); // if ball is too close, then drive slower/backwards
 
-        motor_msg.left_motor_setpoint_vel = e;
-        motor_msg.right_motor_setpoint_vel = -e;
+        RCLCPP_INFO(this->get_logger(), "white_ratio: %f, drive: %f", white_ratio_.data,drive);
 
+        motor_msg.left_motor_setpoint_vel = rotate + drive; 
+        motor_msg.right_motor_setpoint_vel = -rotate + drive;
         motor_pub_->publish(motor_msg);
     }
 
@@ -66,15 +74,23 @@ class SequenceController : public rclcpp::Node {
         light_pos_.y = msg.y;
     }
 
+    void update_zoom(const std_msgs::msg::Float64 &msg) {
+        if (msg.data == -1)
+            return;
+
+        white_ratio_.data = msg.data;
+    }
+
     size_t count_;
     double sample_time_s_;
 
     geometry_msgs::msg::Point light_pos_;
+    std_msgs::msg::Float64 white_ratio_;
 
     rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr
         subscription_light_pos_;
-    rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr
-        subscription_dim_;
+    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr
+        subscription_white_ratio_;
 
     rclcpp::Publisher<xrf2_msgs::msg::Ros2Xeno>::SharedPtr motor_pub_;
     // rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_left_; // std_msgs::msg::Float64
