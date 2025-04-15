@@ -7,11 +7,11 @@ FRTtestBench::FRTtestBench(uint write_decimator_freq, uint monitor_freq) :
 {
      printf("%s: Constructing rampio\n", __FUNCTION__);
     // Add variables to logger to be logged, has to be done before you can log data
-    logger.addVariable("this_is_a_int", integer);
-    logger.addVariable("this_is_a_double", double_);
-    logger.addVariable("this_is_a_float", float_);
-    logger.addVariable("this_is_a_char", character);
-    logger.addVariable("this_is_a_bool", boolean);
+    // logger.addVariable("this_is_a_int", integer);
+    // logger.addVariable("this_is_a_double", double_);
+    // logger.addVariable("this_is_a_float", float_);
+    // logger.addVariable("this_is_a_char", character);
+    // logger.addVariable("this_is_a_bool", boolean);
     
     // To infinite run the controller, uncomment line below
     controller.SetFinishTime(0.0);
@@ -56,22 +56,63 @@ int FRTtestBench::run()
     logger.start();                             
     monitor.printf("Hello from run\n");  
     //  Change some data for logger            
-    data_to_be_logged.this_is_a_bool = !data_to_be_logged.this_is_a_bool;
-    data_to_be_logged.this_is_a_int++;
-    if(data_to_be_logged.this_is_a_char == 'R')
-        data_to_be_logged.this_is_a_char = 'A';
-    else if (data_to_be_logged.this_is_a_char == 'A')
-        data_to_be_logged.this_is_a_char = 'M';
-    else
-        data_to_be_logged.this_is_a_char = 'R';
-    data_to_be_logged.this_is_a_float = data_to_be_logged.this_is_a_float/2;
-    data_to_be_logged.this_is_a_double = data_to_be_logged.this_is_a_double/4; 
+    // data_to_be_logged.this_is_a_bool = !data_to_be_logged.this_is_a_bool;
+    // data_to_be_logged.this_is_a_int++;
+    // if(data_to_be_logged.this_is_a_char == 'R')
+    //     data_to_be_logged.this_is_a_char = 'A';
+    // else if (data_to_be_logged.this_is_a_char == 'A')
+    //     data_to_be_logged.this_is_a_char = 'M';
+    // else
+    //     data_to_be_logged.this_is_a_char = 'R';
+    // data_to_be_logged.this_is_a_float = data_to_be_logged.this_is_a_float/2;
+    // data_to_be_logged.this_is_a_double = data_to_be_logged.this_is_a_double/4; 
 
     // Printf encoder 1 to 4 data
-    monitor.printf("Encoder 1 value : %d\n",sample_data.channel1);
-    monitor.printf("Encoder 2 value : %d\n",sample_data.channel2);
-    monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
-    monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
+    // monitor.printf("Encoder 1 value : %d\n",sample_data.channel1);
+    // monitor.printf("Encoder 2 value : %d\n",sample_data.channel2);
+    // monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
+    // monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
+
+    if (first_time)
+    {
+        old_encoder_left = sample_data.channel1;
+        old_encoder_right = sample_data.channel2;
+        first_time = false;
+    }
+
+    int difference_left = old_encoder_left - sample_data.channel1;
+    int difference_right = old_encoder_right - sample_data.channel2;
+    // monitor.printf("Difference left : %d\n",difference_left);
+    // monitor.printf("Difference right : %d\n",difference_right);
+    old_encoder_left = sample_data.channel1;
+    old_encoder_right = sample_data.channel2;
+ 
+    // monitor.printf("Old Wrap counter left : %d\n",wrap_counter_left);
+    // monitor.printf("Old Wrap counter right : %d\n",wrap_counter_right);
+    if(difference_left > 15000) //any large number smaller than roughly 16000 will suffice
+    {
+        wrap_counter_left++;
+    }
+    else if(difference_left < -15000)
+    {
+        wrap_counter_left--;
+    }
+    if(difference_right > 15000) //any large number smaller than roughly 16000 will suffice
+    {
+        wrap_counter_right++;
+    }
+    else if(difference_right < -15000)
+    {
+        wrap_counter_right--;
+    }
+    // monitor.printf("Wrap counter left : %d\n",wrap_counter_left);
+    // monitor.printf("Wrap counter right : %d\n",wrap_counter_right);
+   
+    int unwrapped_encoder_left = wrap_counter_left*(encoder_max + 1) + sample_data.channel1;
+    int unwrapped_encoder_right = wrap_counter_right*(encoder_max + 1) + sample_data.channel2;
+    monitor.printf("Unwrapped Encoder 1 value : %d\n",unwrapped_encoder_left);
+    monitor.printf("Unwrapped Encoder 2 value : %d\n",unwrapped_encoder_right);
+
 
     // Set motor outputs to setpoint velocities
     actuate_data.pwm1 = 2047.0 * ros_msg.left_motor_setpoint_vel;

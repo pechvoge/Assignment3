@@ -28,6 +28,14 @@ private:
 
     double u[0+1];
     double y[0+1];
+    int old_encoder_left;
+    int old_encoder_right;
+    const int encoder_max = 16383;
+    int wrap_counter_left = 0;
+    int wrap_counter_right = 0;
+    bool first_time = true;
+
+
 protected:
     //Functions
     int initialising() override;
