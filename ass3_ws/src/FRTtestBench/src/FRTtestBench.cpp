@@ -82,25 +82,29 @@ int FRTtestBench::run()
 
     int difference_left = old_encoder_left - sample_data.channel1;
     int difference_right = old_encoder_right - sample_data.channel2;
+    monitor.printf("Difference left : %d\n",difference_left);
+    monitor.printf("Difference right : %d\n",difference_right);
     old_encoder_left = sample_data.channel1;
     old_encoder_right = sample_data.channel2;
 
-    if(difference_left > 15000) //any large number smaller than roughly 16000 will suffice
+    if(difference_left > 10000) //any large number smaller than roughly 16000 will suffice
     {
         wrap_counter_left++;
     }
-    else if(difference_left < -15000)
+    else if(difference_left < -10000)
     {
         wrap_counter_left--;
     }
-    if(difference_right > 15000) //any large number smaller than roughly 16000 will suffice
+    if(difference_right > 10000) //any large number smaller than roughly 16000 will suffice
     {
         wrap_counter_right++;
     }
-    else if(difference_right < -15000)
+    else if(difference_right < -10000)
     {
         wrap_counter_right--;
     }
+    monitor.printf("Wrap counter left : %d\n",wrap_counter_left);
+    monitor.printf("Wrap counter right : %d\n",wrap_counter_right);
     
     int unwrapped_encoder_left = wrap_counter_left*(encoder_max + 1) + sample_data.channel1;
     int unwrapped_encoder_right = wrap_counter_right*(encoder_max + 1) + sample_data.channel2;
