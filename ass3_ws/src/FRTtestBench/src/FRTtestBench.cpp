@@ -120,6 +120,18 @@ int FRTtestBench::run()
     // Calculate the control output
     controller.Calculate(u, y);
 
+    // Saturating the controller output to the range [-1, 1]
+    if (y[0] > 1.0){
+        y[0] = 1.0;
+    } else if (y[0] < -1.0){   
+        y[0] = -1.0;
+    }
+    if (y[1] > 1.0){
+        y[1] = 1.0;
+    } else if (y[1] < -1.0){   
+        y[1] = -1.0;
+    }
+
     // Set motor outputs to setpoint velocities
     actuate_data.pwm1 = 2047.0 * y[0]; // left motor
     actuate_data.pwm2 = -2047.0 * y[1]; // right motor (minus sign to rotate in positive direction)

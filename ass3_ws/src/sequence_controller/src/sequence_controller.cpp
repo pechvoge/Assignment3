@@ -29,11 +29,9 @@ class SequenceController : public rclcpp::Node {
                 "white_ratio", 10,
                 std::bind(&SequenceController::update_zoom, this, _1));
 
-        publisher_left_ = this->create_publisher<std_msgs::msg::Float64>(
-            "left_motor_setpoint_vel", 10);//std_msgs::msg::Float64
-
-        publisher_right_ = this->create_publisher<std_msgs::msg::Float64>(
-            "right_motor_setpoint_vel", 10);//std_msgs::msg::Float64
+        motor_pub_ =
+            this->create_publisher<xrf2_msgs::msg::Ros2Xeno>(
+                "Ros2Xeno", 10);
 
         timer_ = rclcpp::create_timer(
             this, this->get_clock(),
