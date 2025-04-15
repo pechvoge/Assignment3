@@ -68,10 +68,10 @@ int FRTtestBench::run()
     // data_to_be_logged.this_is_a_double = data_to_be_logged.this_is_a_double/4; 
 
     // Printf encoder 1 to 4 data
-    monitor.printf("Encoder 1 value : %d\n",sample_data.channel1);
-    monitor.printf("Encoder 2 value : %d\n",sample_data.channel2);
-    monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
-    monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
+    // monitor.printf("Encoder 1 value : %d\n",sample_data.channel1);
+    // monitor.printf("Encoder 2 value : %d\n",sample_data.channel2);
+    // monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
+    // monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
 
     if (first_time)
     {
@@ -116,8 +116,8 @@ int FRTtestBench::run()
     // Set motor outputs to setpoint velocities
     u[0] = unwrapped_encoder_left*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosLeft (in m) */
 	u[1] = -unwrapped_encoder_right*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosRight (in m)*/
-	u[2] = ros_msg.left_motor_setpoint_vel;		/* SetVelLeft (in m/s)*/
-	u[3] = ros_msg.right_motor_setpoint_vel;		/* SetVelRight (in m/s) */
+	u[2] = -ros_msg.left_motor_setpoint_vel;		/* SetVelLeft (in m/s)*/
+	u[3] = -ros_msg.right_motor_setpoint_vel;		/* SetVelRight (in m/s) */
     monitor.printf("PosLeft : %f\n",u[0]);
     monitor.printf("PosRight : %f\n",u[1]);
     monitor.printf("SetVelLeft : %f\n",u[2]);
@@ -131,8 +131,8 @@ int FRTtestBench::run()
     // Set motor outputs to setpoint velocities
     actuate_data.pwm1 = 2047.0 * y[0]/100.0; // left motor
     actuate_data.pwm2 = -2047.0 * y[1]/100.0; // right motor (minus sign to rotate in positive direction)
-    monitor.printf("PWM1 : %d\n",actuate_data.pwm1);
-    monitor.printf("PWM2 : %d\n",actuate_data.pwm2);
+    // monitor.printf("PWM1 : %d\n",actuate_data.pwm1);
+    // monitor.printf("PWM2 : %d\n",actuate_data.pwm2);
     if(controller.IsFinished())
         return 1;
 
