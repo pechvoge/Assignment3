@@ -73,6 +73,13 @@ int FRTtestBench::run()
     monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
     monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
     
+    if (first_time)
+    {
+        old_encoder_left = sample_data.channel1;
+        old_encoder_right = sample_data.channel2;
+        first_time = false;
+    }
+
     int difference_left = old_encoder_left - sample_data.channel1;
     int difference_right = old_encoder_right - sample_data.channel2;
     old_encoder_left = sample_data.channel1;
@@ -102,7 +109,7 @@ int FRTtestBench::run()
 
     // Set motor outputs to setpoint velocities
     u[0] = unwrapped_encoder_left*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosLeft (in m) */
-	u[1] = unwrapped_encoder_right*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosRight (in m)*/
+	u[1] = -unwrapped_encoder_right*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosRight (in m)*/
 	u[2] = ros_msg.left_motor_setpoint_vel;		/* SetVelLeft (in m/s)*/
 	u[3] = ros_msg.right_motor_setpoint_vel;		/* SetVelRight (in m/s) */
     monitor.printf("PosLeft : %f\n",u[0]);

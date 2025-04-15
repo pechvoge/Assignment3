@@ -1,3 +1,0 @@
-<launch>
-    <node pkg="rosTestBench_pkg" exec="rosTestBench_node" name="rosTestBench_node"/> 
-</launch>

@@ -29,8 +29,8 @@ private:
     double u[4+1];
     double y[2+1];
 
-    int old_encoder_left = 0;
-    int old_encoder_right = 0;
+    int old_encoder_left;
+    int old_encoder_right;
     const int encoder_max = 16383;
     int wrap_counter_left = 0;
     int wrap_counter_right = 0;
@@ -39,6 +39,7 @@ private:
     const int count_p_turn = 1024;
     const float gear_ratio = 15.58;
     const int quad_counter_ratio = 4;
+    bool first_time = true;
 
 
 protected:
