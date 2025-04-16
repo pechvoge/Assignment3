@@ -53,8 +53,7 @@ int FRTtestBench::run()
     // Return 1 to go to stopping state
 
     // Start logger
-    // logger.start();                             
-    monitor.printf("Hello from run\n");  
+    // logger.start();                               
     //  Change some data for logger            
     // data_to_be_logged.this_is_a_bool = !data_to_be_logged.this_is_a_bool;
     // data_to_be_logged.this_is_a_int++;
@@ -81,6 +80,7 @@ int FRTtestBench::run()
         old_encoder_left = current_encoder_left;
         old_encoder_right = current_encoder_right;
         first_time = false;
+        monitor.printf("Hello from run\n");
     }
 
     int difference_left = old_encoder_left - current_encoder_left;
@@ -104,8 +104,8 @@ int FRTtestBench::run()
     {
         wrap_counter_right--;
     }
-    monitor.printf("Wrap counter left : %d\n",wrap_counter_left);
-    monitor.printf("Wrap counter right : %d\n",wrap_counter_right);
+    // monitor.printf("Wrap counter left : %d\n",wrap_counter_left);
+    // monitor.printf("Wrap counter right : %d\n",wrap_counter_right);
     
     int unwrapped_encoder_left = wrap_counter_left*(encoder_max + 1) + sample_data.channel1;
     int unwrapped_encoder_right = wrap_counter_right*(encoder_max + 1) + sample_data.channel2;
