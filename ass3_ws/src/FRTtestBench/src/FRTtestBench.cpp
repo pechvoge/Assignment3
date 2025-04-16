@@ -73,35 +73,38 @@ int FRTtestBench::run()
     // monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
     // monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
 
+    int current_encoder_left = sample_data.channel1;
+    int current_encoder_right = sample_data.channel2;
+
     if (first_time)
     {
-        old_encoder_left = sample_data.channel1;
-        old_encoder_right = sample_data.channel2;
+        old_encoder_left = current_encoder_left;
+        old_encoder_right = current_encoder_right;
         first_time = false;
     }
 
-    int difference_left = old_encoder_left - sample_data.channel1;
-    int difference_right = old_encoder_right - sample_data.channel2;
+    int difference_left = old_encoder_left - current_encoder_left;
+    int difference_right = old_encoder_right - current_encoder_right;
     // monitor.printf("Difference left : %d\n",difference_left);
     // monitor.printf("Difference right : %d\n",difference_right);
-    old_encoder_left = sample_data.channel1;
-    old_encoder_right = sample_data.channel2;
+    old_encoder_left = current_encoder_left;
+    old_encoder_right = current_encoder_right;
  
     // monitor.printf("Old Wrap counter left : %d\n",wrap_counter_left);
     // monitor.printf("Old Wrap counter right : %d\n",wrap_counter_right);
-    if(difference_left > 15000) //any large number smaller than roughly 16000 will suffice
+    if(difference_left > encoder_max / 2) 
     {
         wrap_counter_left++;
     }
-    else if(difference_left < -15000)
+    else if(difference_left < -encoder_max / 2)
     {
         wrap_counter_left--;
     }
-    if(difference_right > 15000) //any large number smaller than roughly 16000 will suffice
+    if(difference_right > encoder_max / 2)
     {
         wrap_counter_right++;
     }
-    else if(difference_right < -15000)
+    else if(difference_right < - encoder_max / 2)
     {
         wrap_counter_right--;
     }
