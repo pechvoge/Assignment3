@@ -49,8 +49,8 @@ void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::Shared
     white_msg_.data = white_ratio;
     white_pub_->publish(white_msg_);
 
-    cv::imshow("object", thresholded_image);
-    cv::waitKey(1);
+    // cv::imshow("object", thresholded_image);
+    // cv::waitKey(1);
 }
 
 void Object_detection_node::parse_parameters()

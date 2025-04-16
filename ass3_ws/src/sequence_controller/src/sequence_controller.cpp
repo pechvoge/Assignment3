@@ -39,18 +39,18 @@ class SequenceController : public rclcpp::Node {
             std::chrono::duration<double>(sample_time_s_),
             std::bind(&SequenceController::sequence_controller, this));
 
-        this->declare_parameter("rotation_gain", 0.001);
-        this->declare_parameter("drive_gain", 5.0);
+        this->declare_parameter("rotation_gain", 0.0008);
+        this->declare_parameter("drive_gain", 2.0);
         this->declare_parameter("width", 320);
-        this->declare_parameter("zoom_threshold", 0.1);
+        this->declare_parameter("zoom_threshold", 0.15);
     }
 
   private:
     void sequence_controller() {
-        auto rotation_gain = this->get_parameter("rotation_gain").as_double();
-        auto drive_gain = this->get_parameter("drive_gain").as_double();
-        auto width = this->get_parameter("width").as_int();
-        auto zoom_threshold = this->get_parameter("zoom_threshold").as_double();
+        rotation_gain = this->get_parameter("rotation_gain").as_double();
+        drive_gain = this->get_parameter("drive_gain").as_double();
+        width = this->get_parameter("width").as_int();
+        zoom_threshold = this->get_parameter("zoom_threshold").as_double();
 
         double rotate = rotation_gain * (light_pos_.x - (width / 2));
 
@@ -60,28 +60,35 @@ class SequenceController : public rclcpp::Node {
 
         RCLCPP_INFO(this->get_logger(), "white_ratio: %f, drive: %f", white_ratio_.data,drive);
 
-        motor_msg.left_motor_setpoint_vel = rotate + drive; 
-        motor_msg.right_motor_setpoint_vel = -rotate + drive;
+        motor_msg.left_motor_setpoint_vel = -rotate + drive; 
+        motor_msg.right_motor_setpoint_vel = rotate + drive;
         motor_pub_->publish(motor_msg);
     }
 
     void update_light_pos(const geometry_msgs::msg::Point &msg) {
-        if (msg.x == -1)
-            return;
+        if (msg.x == -1){ // in case no green object is detected
+            light_pos_.x = width/2;// width / 2
+            light_pos_.y = width/2;// height == width
+            return;}
 
         light_pos_.x = msg.x;
         light_pos_.y = msg.y;
     }
 
     void update_zoom(const std_msgs::msg::Float64 &msg) {
-        if (msg.data == -1)
-            return;
+        if (msg.data < 0.001){// in case no green object is detected
+            white_ratio_.data = zoom_threshold;// at zoom_threshold, no velocity is given
+            return;}
 
         white_ratio_.data = msg.data;
     }
 
     size_t count_;
     double sample_time_s_;
+    float rotation_gain;
+    float drive_gain;
+    int width;
+    float zoom_threshold;
 
     geometry_msgs::msg::Point light_pos_;
     std_msgs::msg::Float64 white_ratio_;
