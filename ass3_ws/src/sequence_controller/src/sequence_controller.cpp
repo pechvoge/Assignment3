@@ -6,6 +6,7 @@
 #include "example_interfaces/msg/float64.hpp"
 
 #include <rclcpp/rclcpp.hpp>
+#include "xrf2_msgs/msg/ros2_xeno.hpp"
 
 #include <std_msgs/msg/float64.hpp>
 
@@ -38,10 +39,10 @@ class SequenceController : public rclcpp::Node {
             std::chrono::duration<double>(sample_time_s_),
             std::bind(&SequenceController::sequence_controller, this));
 
-        this->declare_parameter("rotation_gain", 0.2);
-        this->declare_parameter("drive_gain", 0.1);
+        this->declare_parameter("rotation_gain", 0.001);
+        this->declare_parameter("drive_gain", 5.0);
         this->declare_parameter("width", 320);
-        this->declare_parameter("zoom_threshold", 0.3);
+        this->declare_parameter("zoom_threshold", 0.1);
     }
 
   private:

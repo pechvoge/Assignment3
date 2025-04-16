@@ -104,6 +104,8 @@ int FRTtestBench::run()
     {
         wrap_counter_right--;
     }
+    monitor.printf("Wrap counter left : %d\n",wrap_counter_left);
+    monitor.printf("Wrap counter right : %d\n",wrap_counter_right);
     
     int unwrapped_encoder_left = wrap_counter_left*(encoder_max + 1) + sample_data.channel1;
     int unwrapped_encoder_right = wrap_counter_right*(encoder_max + 1) + sample_data.channel2;
@@ -113,8 +115,8 @@ int FRTtestBench::run()
     // Set motor outputs to setpoint velocities
     u[0] = unwrapped_encoder_left*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosLeft (in m) */
 	u[1] = -unwrapped_encoder_right*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosRight (in m)*/
-	u[2] = ros_msg.left_motor_setpoint_vel;		/* SetVelLeft (in m/s)*/
-	u[3] = ros_msg.right_motor_setpoint_vel;		/* SetVelRight (in m/s) */
+	u[2] = -ros_msg.left_motor_setpoint_vel;		/* SetVelLeft (in m/s)*/
+	u[3] = -ros_msg.right_motor_setpoint_vel;		/* SetVelRight (in m/s) */
     monitor.printf("PosLeft : %f\n",u[0]);
     monitor.printf("PosRight : %f\n",u[1]);
     monitor.printf("SetVelLeft : %f\n",u[2]);
@@ -122,6 +124,8 @@ int FRTtestBench::run()
 
     // Calculate the control output
     controller.Calculate(u, y);
+    monitor.printf("Controller output : %f\n",y[0]);
+    monitor.printf("Controller output : %f\n",y[1]);
 
     // Saturating the controller output to the range [-1, 1]
     if (y[0] > 100.0){
@@ -134,6 +138,7 @@ int FRTtestBench::run()
     } else if (y[1] < -100.0){   
         y[1] = -100.0;
     }
+
 
     // Set motor outputs to setpoint velocities
     actuate_data.pwm1 = 2047.0 * y[0]/100.0; // left motor
