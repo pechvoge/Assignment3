@@ -121,18 +121,18 @@ namespace cam2image_vm2ros
     }
 
     // optionally show the image
-    if (show_camera_)
-    {
-      cv::imshow("cam2image", frame);
-      cv::waitKey(1);
-    }
+    // if (show_camera_)
+    // {
+    //   cv::imshow("cam2image", frame);
+    //   cv::waitKey(1);
+    // }
 
     std_msgs::msg::Header header;
     header.frame_id = frame_id_;
     header.stamp = this->now();
     auto msg = cv_bridge::CvImage(header, "bgr8", frame).toImageMsg();
 
-    RCLCPP_INFO(get_logger(), "Publishing image #%zd", publish_number_++);
+    //RCLCPP_INFO(get_logger(), "Publishing image #%zd", publish_number_++);
     pub_->publish(*msg);
   }
 
