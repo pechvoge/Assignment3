@@ -6,13 +6,6 @@ FRTtestBench::FRTtestBench(uint write_decimator_freq, uint monitor_freq) :
     controller()
 {
      printf("%s: Constructing rampio\n", __FUNCTION__);
-    // Add variables to logger to be logged, has to be done before you can log data
-    // logger.addVariable("this_is_a_int", integer);
-    // logger.addVariable("this_is_a_double", double_);
-    // logger.addVariable("this_is_a_float", float_);
-    // logger.addVariable("this_is_a_char", character);
-    // logger.addVariable("this_is_a_bool", boolean);
-    
     // To infinite run the controller, uncomment line below
     controller.SetFinishTime(0.0);
 }
@@ -29,8 +22,6 @@ int FRTtestBench::initialising()
 
     evl_printf("Hello from initialising\n");      // Do something
 
-    // The logger has to be initialised at only once
-    // logger.initialise();
     // The FPGA has to be initialised at least once
     ico_io.init();
 
@@ -51,28 +42,10 @@ int FRTtestBench::run()
 {
     // Do what you need to do
     // Return 1 to go to stopping state
-
-    // Start logger
-    // logger.start();                             
+                        
     monitor.printf("Hello from run\n");  
-    //  Change some data for logger            
-    // data_to_be_logged.this_is_a_bool = !data_to_be_logged.this_is_a_bool;
-    // data_to_be_logged.this_is_a_int++;
-    // if(data_to_be_logged.this_is_a_char == 'R')
-    //     data_to_be_logged.this_is_a_char = 'A';
-    // else if (data_to_be_logged.this_is_a_char == 'A')
-    //     data_to_be_logged.this_is_a_char = 'M';
-    // else
-    //     data_to_be_logged.this_is_a_char = 'R';
-    // data_to_be_logged.this_is_a_float = data_to_be_logged.this_is_a_float/2;
-    // data_to_be_logged.this_is_a_double = data_to_be_logged.this_is_a_double/4; 
 
-    // Printf encoder 1 to 4 data
-    // monitor.printf("Encoder 1 value : %d\n",sample_data.channel1);
-    // monitor.printf("Encoder 2 value : %d\n",sample_data.channel2);
-    // monitor.printf("Encoder 3 value : %d\n",sample_data.channel3);
-    // monitor.printf("Encoder 4 value : %d\n",sample_data.channel4);
-
+    // Set the old encoder values to the current encoder values if its the first time
     if (first_time)
     {
         old_encoder_left = sample_data.channel1;
@@ -80,44 +53,41 @@ int FRTtestBench::run()
         first_time = false;
     }
     
+    // Calculate the difference between the old and current encoder values
     int difference_left = old_encoder_left - sample_data.channel1;
     int difference_right = old_encoder_right - sample_data.channel2;
-    // monitor.printf("Difference left : %d\n",difference_left);
-    // monitor.printf("Difference right : %d\n",difference_right);
+
+    // Set the current encoder values to the old encoder values
     old_encoder_left = sample_data.channel1;
     old_encoder_right = sample_data.channel2;
 
-    // monitor.printf("Old Wrap counter left : %d\n",wrap_counter_left);
-    // monitor.printf("Old Wrap counter right : %d\n",wrap_counter_right);
-    if(difference_left > 15000) //any large number smaller than roughly 16000 will suffice
+    // Update wrap counters according to the difference between the old and current encoder values
+    if(difference_left > encoder_max/2) 
     {
         wrap_counter_left++;
     }
-    else if(difference_left < -15000)
+    else if(difference_left < -encoder_max/2)
     {
         wrap_counter_left--;
     }
-    if(difference_right > 15000) //any large number smaller than roughly 16000 will suffice
+    if(difference_right > encoder_max/2) 
     {
         wrap_counter_right++;
     }
-    else if(difference_right < -15000)
+    else if(difference_right < -encoder_max/2)
     {
         wrap_counter_right--;
     }
-    // monitor.printf("Wrap counter left : %d\n",wrap_counter_left);
-    // monitor.printf("Wrap counter right : %d\n",wrap_counter_right);
     
+    // Compoute the unwrapped encoder values and print them
     int unwrapped_encoder_left = wrap_counter_left*(encoder_max + 1) + sample_data.channel1;
     int unwrapped_encoder_right = wrap_counter_right*(encoder_max + 1) + sample_data.channel2;
-    // monitor.printf("Unwrapped Encoder 1 value : %d\n",unwrapped_encoder_left);
-    // monitor.printf("Unwrapped Encoder 2 value : %d\n",unwrapped_encoder_right);
 
-    // Set motor outputs to setpoint velocities
-    u[0] = unwrapped_encoder_left*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosLeft (in m) */
-	u[1] = -unwrapped_encoder_right*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		/* PosRight (in m)*/
-	u[2] = -ros_msg.left_motor_setpoint_vel;		/* SetVelLeft (in m/s)*/
-	u[3] = -ros_msg.right_motor_setpoint_vel;		/* SetVelRight (in m/s) */
+    // Set motor outputs to setpoint velocities and convert encoder values to wheel positions
+    u[0] = unwrapped_encoder_left*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		// PosLeft (in m) 
+	u[1] = -unwrapped_encoder_right*pi*d_wheel/(count_p_turn*gear_ratio*quad_counter_ratio);		// PosRight (in m)
+	u[2] = -ros_msg.left_motor_setpoint_vel;		// SetVelLeft (in m/s)
+	u[3] = -ros_msg.right_motor_setpoint_vel;		// SetVelRight (in m/s)
     monitor.printf("PosLeft : %f\n",u[0]);
     monitor.printf("PosRight : %f\n",u[1]);
     monitor.printf("SetVelLeft : %f\n",u[2]);
@@ -131,8 +101,6 @@ int FRTtestBench::run()
     // Set motor outputs to setpoint velocities
     actuate_data.pwm1 = 2047.0 * y[0]/100.0; // left motor
     actuate_data.pwm2 = -2047.0 * y[1]/100.0; // right motor (minus sign to rotate in positive direction)
-    // monitor.printf("PWM1 : %d\n",actuate_data.pwm1);
-    // monitor.printf("PWM2 : %d\n",actuate_data.pwm2);
     if(controller.IsFinished())
         return 1;
 

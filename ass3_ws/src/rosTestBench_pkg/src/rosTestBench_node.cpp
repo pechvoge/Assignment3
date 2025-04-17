@@ -9,17 +9,26 @@ RosTestBench_node::RosTestBench_node(const rclcpp::NodeOptions &options)
 void RosTestBench_node::initialize()
 {
     auto qos = rclcpp::QoS(depth_);
+    // This publisher publishes the motor setpoint velocities to the topic "Ros2Xeno"
     motor_pub_ = this->create_publisher<xrf2_msgs::msg::Ros2Xeno>("Ros2Xeno", qos);
-    // right_motor_pub_ = this->create_publisher<std_msgs::msg::Float64>("Ros2Xeno", qos);
+
+    // Initialize the motor message with default values
     motor_msg.left_motor_setpoint_vel = 0.0;
     motor_msg.right_motor_setpoint_vel = 0.0;
+
+    // Allows the user to set the publisher frequency through the ROS parameter "pub_freq"
     pub_freq_ = this->get_parameter("pub_freq").as_double();
+
+    // Initialize the time to the current time
     init_time = get_clock()->now();
+
+    // This timer calls the publisherCallback function every 1/pub_freq_ seconds
     pub_timer_ = this->create_wall_timer(
       std::chrono::milliseconds(static_cast<int>(1000.0 / pub_freq_)),
       std::bind(&RosTestBench_node::publisherCallback, this));
 }
 
+// This function is called every time the timer is called and it allows to change the velocity test type through setting the ROS parameter "velocity_test"
 void RosTestBench_node::publisherCallback()
 {
     velocity_test_ = this->get_parameter("velocity_test").as_string();
@@ -53,6 +62,7 @@ void RosTestBench_node::publisherCallback()
 
 }
 
+// This functions publishes a constant velocity for both wheels
 void RosTestBench_node::constant_velocity()
 {
     motor_msg.left_motor_setpoint_vel = 0.5;
@@ -60,7 +70,8 @@ void RosTestBench_node::constant_velocity()
 
     motor_pub_->publish(motor_msg);
 }
- 
+
+// This function publishes a sinusoidal velocity for both wheels
 void RosTestBench_node::sinusoidal_velocity()
 {
     auto time = get_clock()->now();
@@ -71,6 +82,7 @@ void RosTestBench_node::sinusoidal_velocity()
     motor_pub_->publish(motor_msg);
 }
  
+// This function publishes a sequence of velocities for both wheels
 void RosTestBench_node::sequence_velocity()
 {
     auto current_time = get_clock()->now();
@@ -105,6 +117,7 @@ void RosTestBench_node::sequence_velocity()
     motor_pub_->publish(motor_msg);
 }
 
+// This function publishes the sequence with a 90 degree turn
 void RosTestBench_node::custom_velocity()
 {
     const float driving_time = 2.0; // seconds
