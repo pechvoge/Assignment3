@@ -26,4 +26,4 @@ Parameters
     const int encoder_max: Maximum encoder value. Default = 16383, taken from manual
 
 Core Components(Modified)
-    run(): calculates and sends actuator inputs using loop controller, which uses wheel positions from unwrapped encoder values and setpoint velocities
+    run(): unwraps encoder values and sends setpoints velocities sent from ROS
