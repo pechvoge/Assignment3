@@ -9,10 +9,11 @@ RosTestBench_node::RosTestBench_node(const rclcpp::NodeOptions &options)
 void RosTestBench_node::initialize()
 {
     auto qos = rclcpp::QoS(depth_);
+    // This publisher sends the motor setpoint velocity to the Ros2Xeno node
     motor_pub_ = this->create_publisher<xrf2_msgs::msg::Ros2Xeno>("Ros2Xeno", qos);
-    // right_motor_pub_ = this->create_publisher<std_msgs::msg::Float64>("Ros2Xeno", qos);
     motor_msg.left_motor_setpoint_vel = 0.0;
     motor_msg.right_motor_setpoint_vel = 0.0;
+
     pub_freq_ = this->get_parameter("pub_freq").as_double();
     init_time = get_clock()->now();
     pub_timer_ = this->create_wall_timer(
@@ -20,6 +21,7 @@ void RosTestBench_node::initialize()
       std::bind(&RosTestBench_node::publisherCallback, this));
 }
 
+// This function is called every time the timer is called and it allows to change the velocity test type through setting the ROS parameter "velocity_test"
 void RosTestBench_node::publisherCallback()
 {
     velocity_test_ = this->get_parameter("velocity_test").as_string();
@@ -44,10 +46,9 @@ void RosTestBench_node::publisherCallback()
         RCLCPP_ERROR(this->get_logger(), "Invalid velocity test type");
         return;
     }
-
-
 }
 
+// This functions publishes a constant velocity for both wheels
 void RosTestBench_node::constant_velocity()
 {
     motor_msg.left_motor_setpoint_vel = 0.5;
@@ -55,7 +56,8 @@ void RosTestBench_node::constant_velocity()
 
     motor_pub_->publish(motor_msg);
 }
- 
+
+// This function publishes a sinusoidal velocity for both wheels
 void RosTestBench_node::sinusoidal_velocity()
 {
     auto time = get_clock()->now();
@@ -65,7 +67,9 @@ void RosTestBench_node::sinusoidal_velocity()
  
     motor_pub_->publish(motor_msg);
 }
- 
+
+// This function publishes a sequence of velocities for both wheels
+// The sequence is: steer right, steer left, drive forward, drive backward, repeat sequence
 void RosTestBench_node::sequence_velocity()
 {
     auto current_time = get_clock()->now();
