@@ -69,7 +69,7 @@ class SequenceController : public rclcpp::Node {
     }
 
     void update_light_pos(const geometry_msgs::msg::Point &msg) {
-        if (msg.x == -1){ // in case no green object is detected
+        if (msg.x == -1){ // in case no green object is detected NaN is converted to -1
             light_pos_.x = width/2;
             light_pos_.y = width/2;// height == width
             return;}
@@ -79,7 +79,7 @@ class SequenceController : public rclcpp::Node {
     }
 
     void update_zoom(const std_msgs::msg::Float64 &msg) {
-        if (msg.data < 0.001){// in case no green object is detected
+        if (msg.data < no_object_threshold){// in case no green object is detected
             white_ratio_.data = zoom_threshold;// at zoom_threshold, no velocity is given
             return;}
 
@@ -92,6 +92,7 @@ class SequenceController : public rclcpp::Node {
     float drive_gain;
     int width;
     float zoom_threshold;
+    float no_object_threshold = 0.001; // threshold for no object detected
 
     geometry_msgs::msg::Point light_pos_;
     std_msgs::msg::Float64 white_ratio_;
