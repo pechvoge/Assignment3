@@ -10,6 +10,8 @@
 
 #include <std_msgs/msg/float64.hpp>
 
+// Normally there would be a header file for this node, but because we modified and used the code provided
+// we decided to keep it in only a cpp file, which a TA agreed with us on.
 
 using std::placeholders::_1;
 
@@ -47,17 +49,18 @@ class SequenceController : public rclcpp::Node {
 
   private:
     void sequence_controller() {
+        // Allows the gains, subimage width and zoom threshold to be changed as ROS2 parameters
         rotation_gain = this->get_parameter("rotation_gain").as_double();
         drive_gain = this->get_parameter("drive_gain").as_double();
         width = this->get_parameter("width").as_int();
         zoom_threshold = this->get_parameter("zoom_threshold").as_double();
 
+        // Controller that determines the velocity for rotating/turning based on the green object position and the center of subimage
         double rotate = rotation_gain * (light_pos_.x - (width / 2));
-
         RCLCPP_INFO(this->get_logger(), "light_pos.x: %f, rotate: %f", light_pos_.x,rotate);
 
+        // Controller that determines the velocity for driving/zooming based on the white ratio and the zoom threshold
         double drive = - drive_gain * (white_ratio_.data - zoom_threshold); // if ball is too close, then drive slower/backwards
-
         RCLCPP_INFO(this->get_logger(), "white_ratio: %f, drive: %f", white_ratio_.data,drive);
 
         motor_msg.left_motor_setpoint_vel = -rotate + drive; 
@@ -67,7 +70,7 @@ class SequenceController : public rclcpp::Node {
 
     void update_light_pos(const geometry_msgs::msg::Point &msg) {
         if (msg.x == -1){ // in case no green object is detected
-            light_pos_.x = width/2;// width / 2
+            light_pos_.x = width/2;
             light_pos_.y = width/2;// height == width
             return;}
 
@@ -99,8 +102,6 @@ class SequenceController : public rclcpp::Node {
         subscription_white_ratio_;
 
     rclcpp::Publisher<xrf2_msgs::msg::Ros2Xeno>::SharedPtr motor_pub_;
-    // rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_left_; // std_msgs::msg::Float64
-    // rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_right_; //std_msgs::msg::Float64
 
     rclcpp::TimerBase::SharedPtr timer_;
 

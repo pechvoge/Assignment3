@@ -19,6 +19,7 @@ void Object_detection_node::initialize(){
     high_H = 85, high_S = 255, high_V = 255; 
 }
 
+// This functions determines the center of gravity of the green object in the image
 void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::SharedPtr msg)
 {
     cv_bridge::CvImageConstPtr cvimage_ptr;
@@ -34,13 +35,15 @@ void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::Shared
     CoG.y = mom.m01 / mom.m00;
     CoG.z = 0;
 
+    // Check if the CoG is NaN and set it to -1 if so
     if(CoG.x != CoG.x || CoG.y != CoG.y){
         CoG.x = -1;
         CoG.y = -1;
     }
     CoG_pub_->publish(CoG);
-    //RCLCPP_INFO(get_logger(), "CoG is at (%f, %f)", CoG.x, CoG.y);
 
+
+    // The following lines of code calculate the ratio of white pixels in the thresholded image and publishes it
     std_msgs::msg::Float64 white_msg_;
 
     int white_pixels = cv::countNonZero(thresholded_image);
@@ -49,6 +52,7 @@ void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::Shared
     white_msg_.data = white_ratio;
     white_pub_->publish(white_msg_);
 
+    // Uncomment the following lines to visualize the thresholded image
     // cv::imshow("object", thresholded_image);
     // cv::waitKey(1);
 }
