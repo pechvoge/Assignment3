@@ -18,6 +18,7 @@ void Object_detection_node::initialize(){
     high_H = 85, high_S = 255, high_V = 255; 
 }
 
+// This functions determines the center of gravity of the green object in the image
 void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::SharedPtr msg)
 {
     cv_bridge::CvImageConstPtr cvimage_ptr;
@@ -38,7 +39,7 @@ void Object_detection_node::CoG_determiner(const sensor_msgs::msg::Image::Shared
         CoG.y = -1;
     }
     CoG_pub_->publish(CoG);
-    //RCLCPP_INFO(get_logger(), "CoG is at (%f, %f)", CoG.x, CoG.y);
+    
     cv::imshow("object", thresholded_image);
     cv::waitKey(1);
 }

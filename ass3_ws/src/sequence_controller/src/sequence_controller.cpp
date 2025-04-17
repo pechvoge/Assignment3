@@ -9,6 +9,8 @@
 
 #include <std_msgs/msg/float64.hpp>
 
+// Normally there would be a header file for this node, but because we modified and used the code provided
+// we decided to keep it in only a cpp file, which a TA agreed with us on.
 
 using std::placeholders::_1;
 
@@ -25,10 +27,10 @@ class SequenceController : public rclcpp::Node {
                 std::bind(&SequenceController::update_light_pos, this, _1));
 
         publisher_left_ = this->create_publisher<std_msgs::msg::Float64>(
-            "left_motor_setpoint_vel", 10);//std_msgs::msg::Float64
+            "left_motor_setpoint_vel", 10);
 
         publisher_right_ = this->create_publisher<std_msgs::msg::Float64>(
-            "right_motor_setpoint_vel", 10);//std_msgs::msg::Float64
+            "right_motor_setpoint_vel", 10);
 
         timer_ = rclcpp::create_timer(
             this, this->get_clock(),
@@ -49,8 +51,8 @@ class SequenceController : public rclcpp::Node {
         RCLCPP_INFO(this->get_logger(), "light_pos.x: %f, e: %f", light_pos_.x,
                     e);
 
-        auto vel_left = std_msgs::msg::Float64();//std_msgs::msg::Float64
-        auto vel_right = std_msgs::msg::Float64();//std_msgs::msg::Float64
+        auto vel_left = std_msgs::msg::Float64();
+        auto vel_right = std_msgs::msg::Float64();
 
         vel_left.data = e;
         vel_right.data = -e;
@@ -77,8 +79,8 @@ class SequenceController : public rclcpp::Node {
     rclcpp::Subscription<geometry_msgs::msg::Point>::SharedPtr
         subscription_dim_;
 
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_left_; // std_msgs::msg::Float64
-    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_right_; //std_msgs::msg::Float64
+    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_left_; 
+    rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr publisher_right_; 
 
     rclcpp::TimerBase::SharedPtr timer_;
 };
