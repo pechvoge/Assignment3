@@ -28,6 +28,7 @@ int FRTtestBench::initialising()
     // The FPGA has to be initialised at least once
     ico_io.init();
 
+    // When initialising the system, the system immediately goes to the initialised state
     return 1;
 }
 
